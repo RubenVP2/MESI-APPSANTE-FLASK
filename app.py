@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return jsonify({"name": "alice", "email": "alice@outlook.com"})
+    return jsonify({"name": "ruben", "email": "ruben.veloso@outlook.com"})
 
 
 """
