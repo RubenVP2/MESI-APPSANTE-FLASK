@@ -1,10 +1,12 @@
 import sqlite3
 import click
 from flask import Flask, g, render_template, json, request
+from flask_cors import CORS
 from flask.cli import with_appcontext
 from flask.json import jsonify
 
 app = Flask(__name__)
+cors = CORS(app)
 
 
 @app.route("/")
