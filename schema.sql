@@ -1,4 +1,21 @@
--- A FAIRE ! ! ! ! ! Confirmer les typages
+-- Delete table if exists
+DROP TABLE IF EXISTS MADE_WORK;
+DROP TABLE IF EXISTS MUSCLE;
+DROP TABLE IF EXISTS PROFIL;
+DROP TABLE IF EXISTS EXERCICE;
+DROP TABLE IF EXISTS USED;
+DROP TABLE IF EXISTS WELL_BEING;
+DROP TABLE IF EXISTS HAVE;
+DROP TABLE IF EXISTS MAY_HAVE_A;
+DROP TABLE IF EXISTS USER;
+DROP TABLE IF EXISTS FEEDBACK;
+DROP TABLE IF EXISTS SPORTS_PROGRAM;
+DROP TABLE IF EXISTS MEANSUREMENTS;
+DROP TABLE IF EXISTS GOAL;
+
+
+-- A FAIRE ! ! ! ! ! Confirmer les typages + Rajouter AUTOINCREMENT
+
 CREATE TABLE "MADE_WORK" (
     "id_muscle" INT,
     "id_exercice" INT,
@@ -69,7 +86,7 @@ CREATE TABLE "MAY_HAVE_A" (
     FOREIGN KEY ("id_sports_program") REFERENCES "SPORTS_PROGRAM" ("id_sports_program")
 );
 CREATE TABLE "USER" (
-    "id_user" BIGINT,
+    "id_user" INTEGER PRIMARY KEY AUTOINCREMENT,
     "username" VARCHAR(50),
     "password" VARCHAR,
     "mail" VARCHAR(250),
@@ -78,7 +95,6 @@ CREATE TABLE "USER" (
     "reminderweight" INT,
     "remindermeasurements" INT,
     "id_goal" INT,
-    PRIMARY KEY ("id_user"),
     FOREIGN KEY ("id_goal") REFERENCES "GOAL" ("id_goal")
 );
 CREATE TABLE "FEEDBACK" (
@@ -116,3 +132,8 @@ CREATE TABLE "GOAL" (
     "goaltype" VARCHAR,
     PRIMARY KEY ("id_goal")
 );
+
+
+INSERT INTO USER (username, password, mail,  sexe, age, reminderweight, remindermeasurements)
+VALUES
+  ('antoine','monmotdepassimpossibleatrouver', 'antoinebouardain@gmail.com', 'Homme', 20, 2, 30);

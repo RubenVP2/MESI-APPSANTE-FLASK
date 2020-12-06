@@ -1,6 +1,6 @@
 import sqlite3
 import click
-from flask import Flask, g, render_template
+from flask import Flask, g, render_template, json, request
 from flask.cli import with_appcontext
 from flask.json import jsonify
 
@@ -10,6 +10,20 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return jsonify({"name": "ruben", "email": "ruben.veloso@outlook.com"})
+
+# Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!! 
+# Explication : https://medium.com/@PyGuyCharles/python-sql-to-json-and-beyond-3e3a36d32853
+# Moyen de faciliter les requetes ici en modifiant correctement la fonction make_query (voir avec Ruben)
+
+@app.route("/test/allUsers")
+def all_users():
+    """ Return in JSON informations about all the user """
+    users = get_all_users()
+    usersJSON = []
+    for row in users:
+            usersJSON.append({'username': row[0], 'password': row[1], 'mail': row[2], 'sexe': row[3], 'age': row[4], 'reminderweight': row[5], 'remindermeasurements': row[6]})
+
+    return json.dumps({'users' : usersJSON})
 
 
 """
@@ -28,6 +42,18 @@ def make_query(query: str, needCommit: bool, isAll: bool = None):
     if isAll:
         return cur.fetchall()
     return cur.fetchone()
+
+# Cette fonction ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
+
+def get_all_users():
+    """ Return information of all the user """
+    return make_query(
+        f"""
+        SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements
+        FROM USER""",
+        0,
+        1,
+    )
 
 
 def get_db():
