@@ -11,19 +11,21 @@ app = Flask(__name__)
 def index():
     return jsonify({"name": "ruben", "email": "ruben.veloso@outlook.com"})
 
-# Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!! 
+
+# Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
 # Explication : https://medium.com/@PyGuyCharles/python-sql-to-json-and-beyond-3e3a36d32853
 # Moyen de faciliter les requetes ici en modifiant correctement la fonction make_query (voir avec Ruben)
+
 
 @app.route("/test/allUsers")
 def all_users():
     """ Return in JSON informations about all the user """
-    users = get_all_users()
-    usersJSON = []
-    for row in users:
-            usersJSON.append({'username': row[0], 'password': row[1], 'mail': row[2], 'sexe': row[3], 'age': row[4], 'reminderweight': row[5], 'remindermeasurements': row[6]})
-
-    return json.dumps({'users' : usersJSON})
+    users = make_query(
+        f"SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements FROM USER ",
+        0,
+        isAll=1,
+    )
+    return json.dumps({"users": users})
 
 
 """
@@ -32,28 +34,20 @@ def all_users():
 
 
 def make_query(query: str, needCommit: bool, isAll: bool = None):
-    """ Execute query and make commit if necessary return fetchall if passed in params """
+    """ Execute la requête passé en paramètre """
     db = get_db()
     cur = db.cursor()
-    cur.execute(query)
+    results = cur.execute(query)
+    # needCommit permet de spécifier si la database doit persister les données ( mettre a True si c'est un Update / INSERT / DELETE )
     if needCommit:
         db.commit()
         return "DONE"
+    # Spécifie si on doit retourner un tableau avec tout les éléments ( True si c'est un select et que l'on attend plusieurs valeurs )
     if isAll:
-        return cur.fetchall()
+        items = [dict(zip([key[0] for key in cur.description], row)) for row in results]
+        return items
+    # Si needCommit et isAll sont à False alors ça retourne le seul élément du select ( à utiliser par exemple pour sélectionner un utilisateur précis)
     return cur.fetchone()
-
-# Cette fonction ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
-
-def get_all_users():
-    """ Return information of all the user """
-    return make_query(
-        f"""
-        SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements
-        FROM USER""",
-        0,
-        1,
-    )
 
 
 def get_db():
