@@ -1,15 +1,15 @@
 import sqlite3
 import click
-from flask import Flask, g, render_template, json, request
+
+from flask import Flask, g, json
 from flask.cli import with_appcontext
-from flask.json import jsonify
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def index():
-    return jsonify({"name": "ruben", "email": "ruben.veloso@outlook.com"})
+    return json.dumps({"username": "ruebn"})
 
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
@@ -56,7 +56,7 @@ def get_user(idUser: int):
         isAll=0,
     )
 
-def make_query(query: str, needCommit: bool, isAll: bool = None):
+def make_query(query: str, needCommit: bool):
     """ Execute la requête passé en paramètre """
     db = get_db()
     cur = db.cursor()
@@ -65,12 +65,8 @@ def make_query(query: str, needCommit: bool, isAll: bool = None):
     if needCommit:
         db.commit()
         return "DONE"
-    # Spécifie si on doit retourner un tableau avec tout les éléments ( True si c'est un select et que l'on attend plusieurs valeurs )
-    if isAll:
-        items = [dict(zip([key[0] for key in cur.description], row)) for row in results]
-        return items
-    # Si needCommit et isAll sont à False alors ça retourne le seul élément du select ( à utiliser par exemple pour sélectionner un utilisateur précis)
-    return cur.fetchone()
+    items = [dict(zip([key[0] for key in cur.description], row)) for row in results]
+    return items
 
 
 def get_db():
