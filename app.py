@@ -20,18 +20,41 @@ def index():
 @app.route("/test/allUsers")
 def all_users():
     """ Return in JSON informations about all the user """
-    users = make_query(
-        f"SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements FROM USER ",
-        0,
-        isAll=1,
-    )
+    users = get_all_users()
     return json.dumps({"users": users})
+
+
+@app.route("/test/user/<int:idUser>")
+def user(idUser: int):
+    """ Return in JSON informations about the user """
+    user = get_user(idUser)
+    return json.dumps({"user": user})
 
 
 """
     Partie BDD
 """
 
+def get_all_users():
+    """ Return information of all the user """
+    return make_query(
+        f"""
+        SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements
+        FROM USER""",
+        0,
+        isAll=1,
+    )
+
+def get_user(idUser: int):
+    """ Return information of the user """
+    return make_query(
+        f"""
+        SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements
+        FROM USER
+        WHERE id_user = {idUser}""",
+        0,
+        isAll=0,
+    )
 
 def make_query(query: str, needCommit: bool, isAll: bool = None):
     """ Execute la requête passé en paramètre """
