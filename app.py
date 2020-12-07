@@ -42,7 +42,6 @@ def get_all_users():
         SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements
         FROM USER""",
         0,
-        isAll=1,
     )
 
 def get_user(idUser: int):
@@ -53,7 +52,6 @@ def get_user(idUser: int):
         FROM USER
         WHERE id_user = {idUser}""",
         0,
-        isAll=0,
     )
 
 def make_query(query: str, needCommit: bool):
