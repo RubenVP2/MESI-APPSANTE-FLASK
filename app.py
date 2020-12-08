@@ -15,11 +15,8 @@ def index():
 
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
-# Explication : https://medium.com/@PyGuyCharles/python-sql-to-json-and-beyond-3e3a36d32853
-# Moyen de faciliter les requetes ici en modifiant correctement la fonction make_query (voir avec Ruben)
 
-
-@app.route("/test/allUsers")
+@app.route("/test/user/all")
 def all_users():
     """ Return in JSON informations about all the user """
     users = get_all_users()
