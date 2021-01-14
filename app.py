@@ -1,51 +1,60 @@
 import sqlite3
 import click
-from flask import Flask, g, render_template, json, request
-from flask_cors import CORS
+
+from flask import Flask, g, json
+
+# from flask_cors import CORS
 from flask.cli import with_appcontext
-from flask.json import jsonify
 
 app = Flask(__name__)
-cors = CORS(app)
+# cors = CORS(app)
+
+
+"""
+Enable CORS. Disable it if you don't need CORS
+https://parzibyte.me/blog
+"""
+
+
+@app.after_request
+def after_request(response):
+    response.headers[
+        "Access-Control-Allow-Origin"
+    ] = "*"  # <- You can change "*" for a domain for example "http://localhost"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS, PUT, DELETE"
+    response.headers[
+        "Access-Control-Allow-Headers"
+    ] = "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+    return response
 
 
 @app.route("/")
 def index():
-    return jsonify({"name": "ruben", "email": "ruben.veloso@outlook.com"})
+    return json.dumps({"username": "ruebn"})
 
-# Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!! 
-# Explication : https://medium.com/@PyGuyCharles/python-sql-to-json-and-beyond-3e3a36d32853
-# Moyen de faciliter les requetes ici en modifiant correctement la fonction make_query (voir avec Ruben)
 
-@app.route("/test/allUsers")
+# Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
+
+
+@app.route("/test/user/all")
 def all_users():
     """ Return in JSON informations about all the user """
     users = get_all_users()
-    usersJSON = []
-    for row in users:
-            usersJSON.append({'username': row[0], 'password': row[1], 'mail': row[2], 'sexe': row[3], 'age': row[4], 'reminderweight': row[5], 'remindermeasurements': row[6]})
+    return json.dumps({"users": users})
 
-    return json.dumps({'users' : usersJSON})
+
+@app.route("/test/user/<int:idUser>")
+def user(idUser: int):
+    """ Return in JSON informations about the user """
+    user = get_user(idUser)
+    return json.dumps({"user": user})
 
 
 """
     Partie BDD
 """
 
-
-def make_query(query: str, needCommit: bool, isAll: bool = None):
-    """ Execute query and make commit if necessary return fetchall if passed in params """
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(query)
-    if needCommit:
-        db.commit()
-        return "DONE"
-    if isAll:
-        return cur.fetchall()
-    return cur.fetchone()
-
-# Cette fonction ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
 
 def get_all_users():
     """ Return information of all the user """
@@ -54,8 +63,31 @@ def get_all_users():
         SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements
         FROM USER""",
         0,
-        1,
     )
+
+
+def get_user(idUser: int):
+    """ Return information of the user """
+    return make_query(
+        f"""
+        SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements
+        FROM USER
+        WHERE id_user = {idUser}""",
+        0,
+    )
+
+
+def make_query(query: str, needCommit: bool):
+    """ Execute la requête passé en paramètre """
+    db = get_db()
+    cur = db.cursor()
+    results = cur.execute(query)
+    # needCommit permet de spécifier si la database doit persister les données ( mettre a True si c'est un Update / INSERT / DELETE )
+    if needCommit:
+        db.commit()
+        return "DONE"
+    items = [dict(zip([key[0] for key in cur.description], row)) for row in results]
+    return items
 
 
 def get_db():

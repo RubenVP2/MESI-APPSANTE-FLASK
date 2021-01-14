@@ -136,4 +136,5 @@ CREATE TABLE "GOAL" (
 
 INSERT INTO USER (username, password, mail,  sexe, age, reminderweight, remindermeasurements)
 VALUES
+  ('ruben','lesuperbemotdepassederuben', 'ruben@gmail.com', 'Homme', 20, 5, 60),
   ('antoine','monmotdepassimpossibleatrouver', 'antoinebouardain@gmail.com', 'Homme', 20, 2, 30);
