@@ -2,11 +2,31 @@ import sqlite3
 import click
 
 from flask import Flask, g, json
-from flask_cors import CORS
+
+# from flask_cors import CORS
 from flask.cli import with_appcontext
 
 app = Flask(__name__)
-cors = CORS(app)
+# cors = CORS(app)
+
+
+"""
+Enable CORS. Disable it if you don't need CORS
+https://parzibyte.me/blog
+"""
+
+
+@app.after_request
+def after_request(response):
+    response.headers[
+        "Access-Control-Allow-Origin"
+    ] = "*"  # <- You can change "*" for a domain for example "http://localhost"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS, PUT, DELETE"
+    response.headers[
+        "Access-Control-Allow-Headers"
+    ] = "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+    return response
 
 
 @app.route("/")
@@ -15,6 +35,7 @@ def index():
 
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
+
 
 @app.route("/test/user/all")
 def all_users():
@@ -30,9 +51,24 @@ def user(idUser: int):
     return json.dumps({"user": user})
 
 
+# Récupération de tout les exercices
+@app.route("/exercices")
+def exercices():
+    exercices = make_query("SELECT * FROM exercice;", 0)
+    return json.dumps({"exercices": exercices})
+
+
+# Récupération d'un exercice par id
+@app.route("/exercices/<int:id>")
+def exercices_by_id(id: int):
+    exercice = make_query(f"SELECT * FROM exercice WHERE id_exercice = {id};", 0)
+    return json.dumps({"exercice": exercice})
+
+
 """
     Partie BDD
 """
+
 
 def get_all_users():
     """ Return information of all the user """
@@ -43,6 +79,7 @@ def get_all_users():
         0,
     )
 
+
 def get_user(idUser: int):
     """ Return information of the user """
     return make_query(
@@ -52,6 +89,7 @@ def get_user(idUser: int):
         WHERE id_user = {idUser}""",
         0,
     )
+
 
 def make_query(query: str, needCommit: bool):
     """ Execute la requête passé en paramètre """
