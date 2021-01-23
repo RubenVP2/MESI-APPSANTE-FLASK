@@ -51,6 +51,20 @@ def user(idUser: int):
     return json.dumps({"user": user})
 
 
+# Récupération de tout les exercices
+@app.route("/exercices")
+def exercices():
+    exercices = make_query("SELECT * FROM exercice;", 0)
+    return json.dumps({"exercices": exercices})
+
+
+# Récupération d'un exercice par id
+@app.route("/exercices/<int:id>")
+def exercices_by_id(id: int):
+    exercice = make_query(f"SELECT * FROM exercice WHERE id_exercice = {id};", 0)
+    return json.dumps({"exercice": exercice})
+
+
 """
     Partie BDD
 """
