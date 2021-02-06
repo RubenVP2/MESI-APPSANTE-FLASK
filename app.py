@@ -1,7 +1,7 @@
 import sqlite3
 import click
 
-from flask import Flask, g, json
+from flask import Flask, g, json, request, jsonify
 
 # from flask_cors import CORS
 from flask.cli import with_appcontext
@@ -32,6 +32,32 @@ def after_request(response):
 @app.route("/")
 def index():
     return json.dumps({"username": "ruebn"})
+
+#Insert a new user
+@app.route("/inscription", methods = {"post"})
+def inscription():
+        content = request.json
+        username = content['username']
+        email = content['email']
+        age = content['age']
+        sexe = content['sexe']
+        # For the registration we generate a hash for the password.
+        pswd = generate_password_hash(content['password'])
+        #pswd1 = content['password']
+        db = get_db()
+        # check if one user already uses this email
+        testEmail = db.execute('SELECT id_user FROM user WHERE mail = (?)', (email,)).fetchall()
+        # check if the 2 passwords are not equals
+        #if not check_password_hash(pswd, pswd1):
+            #return json.dumps({"error : Mots de passes différents"})
+        # if email not yet used
+        if len(testEmail) == 0:
+            # We insert the values of the registration into the database
+            make_query(f'INSERT INTO user (username,password,mail,age,sexe) VALUES({username},{pswd},{email},{age},{sexe})',True)
+            return json.dumps({"Inscription Réussie"})
+        else:
+            return json.dumps({"error : Mail déja utilisé !"})
+        
 
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
