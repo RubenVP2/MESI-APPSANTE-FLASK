@@ -1,0 +1,80 @@
+FORMAT: 1A
+HOST: https://polls.apiblueprint.org/
+
+# APP SANTE API
+
+APP SANTE API est l'api du projet MESI qui communique avec l'application web APP SANTE.
+
+**API Version :** `v1`
+
+## Information
+### Links
+- [Github](https://github.com/RubenVP2/MESI-APPSANTE-FLASK)
+
+## HTTP Response
+- 200 `OK` - La requête a réussi.
+- 400 `Bad Request` -  Le serveur n'a pas pu comprendre la requête à cause d'une syntaxe invalide.
+- 500 `Internal Server Error` - Le serveur a rencontré une situation qu'il ne sait pas traiter.
+
+
+## Users [/users]
+
+Liste l'ensemble des utilisateurs.
+
+**Endpoint Path :** `/users`
+
+|  Requête | Paramètre | Description |
+| ----------- | ----------- | ----------- | 
+| / | NA | Retourne une liste de tous les utilisateurs
+| /{id} | Integer | Retourne l'utilisateur correspondant à l'id
+
+### Lister tous les utilisateurs [GET]
+
++ Response 200 (application/json)
+
+        [
+          {
+            "age": 20,
+            "mail": "ruben.example@gmail.com",
+            "remindermeasurements": 60,
+            "reminderweight": 5,
+            "sexe": "Homme",
+            "username": "Ruben"
+          }
+        ]
+
+## Exercices [/exercices]
+
+List l'ensemble des exercices de musculation.
+
+**Endpoint Path:** `/exercices`
+
+|  Requête | Paramètre | Description |
+| ----------- | ----------- | ----------- | 
+| / | NA | Retourne une liste de tous les exercices
+| /{id} | Integer | Retourne l'exercice correspondant à l'id
+
+### Lister tous les exercices [GET]
+
++ Response 200 (application/json)
+
+        [
+          {
+            "id_exercice": 1,
+            "imagehelp": "",
+            "nbreps": 15,
+            "nbseries": 4,
+            "restexercice": "120",
+            "restseries": "45",
+            "title": "Pompes"
+          },
+          {
+            "id_exercice": 2,
+            "imagehelp": "",
+            "nbreps": 12,
+            "nbseries": 4,
+            "restexercice": "120",
+            "restseries": "45",
+            "title": "Tractions"
+            }
+        ]
