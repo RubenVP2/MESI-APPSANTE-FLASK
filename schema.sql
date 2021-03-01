@@ -58,7 +58,7 @@ CREATE TABLE "USED" (
     FOREIGN KEY ("id_exercice") REFERENCES "EXERCICE" ("id_exercice")
 );
 CREATE TABLE "WELL_BEING" (
-    "id_well_being" BIGINT,
+    "id_well_being" INTEGER PRIMARY KEY AUTOINCREMENT,
     "calories" INT,
     "water" REAL,
     "sleep" REAL,
@@ -67,7 +67,6 @@ CREATE TABLE "WELL_BEING" (
     "imc" REAL,
     "date" DATETIME,
     "id_user" BIGINT,
-    PRIMARY KEY ("id_well_being"),
     FOREIGN KEY ("id_user") REFERENCES "USER" ("id_user")
 );
 CREATE TABLE "HAVE" (
@@ -138,3 +137,15 @@ INSERT INTO USER (username, password, mail,  sexe, age, reminderweight, reminder
 VALUES
   ('ruben','lesuperbemotdepassederuben', 'ruben@gmail.com', 'Homme', 20, 5, 60),
   ('antoine','monmotdepassimpossibleatrouver', 'antoinebouardain@gmail.com', 'Homme', 20, 2, 30);
+
+INSERT INTO WELL_BEING (calories, water, sleep, size, weight, imc, date, id_user)
+VALUES
+    (127.23, 2.9, 8.20, 176.2, 67.9, 20.4, '2009-01-01', 1),
+    (127.23, 2.1, 8.20, 176.2, 67.9, 20.4, '2007-01-01', 2),
+    (111.23, 1.2, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 1),
+    (111.23, 1.9, 1.20, 111.2, 10.9, 20.4, '2011-05-01', 1),
+    (111.23, 1.9, 1.20, 111.2, 31.9, 20.4, '2011-05-01', 1),
+    (111.23, 7.9, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 1);
+
+
+

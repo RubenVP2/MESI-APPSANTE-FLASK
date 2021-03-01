@@ -50,6 +50,11 @@ def user(idUser: int):
     user = get_user(idUser)
     return json.dumps({"user": user})
 
+@app.route("/user/water/<int:idUser>")
+def userWaters(idUser:int ):
+    """Return in JSON Informations about user water"""
+    userWater = get_watersOfUser(idUser)
+    return json.dumps({"userWater": userWater})
 
 """
     Partie BDD
@@ -64,6 +69,18 @@ def get_all_users():
         FROM USER""",
         0,
     )
+
+
+def get_watersOfUser(idUser: int):
+    """return les enregistrements en eau d'un user"""
+    return make_query(
+        f"""
+        SELECT id_well_being,date,water, weight
+        FROM WELL_BEING
+        WHERE id_user = {idUser}""",
+        0,
+    )  
+
 
 
 def get_user(idUser: int):
