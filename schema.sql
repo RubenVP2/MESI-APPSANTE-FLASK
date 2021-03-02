@@ -93,9 +93,11 @@ CREATE TABLE "USER" (
 );
 CREATE TABLE "FEEDBACK" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "nature" VARCHAR,
     "title" VARCHAR(50),
     "description" VARCHAR,
     "date" DATETIME,
+    "etat" VARCHAR,
     "id_user" BIGINT,
     FOREIGN KEY ("id_user") REFERENCES "USER" ("id_user")
 );
