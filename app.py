@@ -2,6 +2,7 @@ import sqlite3
 import click
 
 from flask import Flask, g, json, request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # from flask_cors import CORS
 from flask.cli import with_appcontext
@@ -33,31 +34,47 @@ def after_request(response):
 def index():
     return json.dumps({"username": "ruebn"})
 
-#Insert a new user
-@app.route("/inscription", methods = {"post"})
-def inscription():
+@app.route('/login', methods={"GET", "POST"})
+def login():
+    if request.method == "POST":
+        make_query(f'DELETE FROM user WHERE username = "jose"',True)
         content = request.json
         username = content['username']
-        email = content['email']
+        pswd = content['password']
+        db = get_db()
+        mdp = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
+        # conditions to check password and mail
+        if (len(mdp) == 0):
+            return "Username incorrect"
+        elif check_password_hash(mdp[0]['password'], pswd):
+            return "Authentification ok"
+        else:
+            return 'Mot de passe incorrect'
+
+#Insert a new user
+@app.route("/register", methods={"GET", "POST"})
+def inscription():
+    if request.method == "POST":
+        content = request.get_json()
+        username = content['username']
+        email = content['mail']
         age = content['age']
         sexe = content['sexe']
         # For the registration we generate a hash for the password.
-        pswd = generate_password_hash(content['password'])
-        #pswd1 = content['password']
+        pswd1 = generate_password_hash(content['password'])
         db = get_db()
         # check if one user already uses this email
-        testEmail = db.execute('SELECT id_user FROM user WHERE mail = (?)', (email,)).fetchall()
-        # check if the 2 passwords are not equals
-        #if not check_password_hash(pswd, pswd1):
-            #return json.dumps({"error : Mots de passes différents"})
-        # if email not yet used
-        if len(testEmail) == 0:
-            # We insert the values of the registration into the database
-            make_query(f'INSERT INTO user (username,password,mail,age,sexe) VALUES({username},{pswd},{email},{age},{sexe})',True)
-            return json.dumps({"Inscription Réussie"})
-        else:
-            return json.dumps({"error : Mail déja utilisé !"})
-        
+        testEmail = make_query(f'SELECT password FROM user WHERE mail = "{email}"',0)
+        testUsername = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
+        # if email already used
+        if len(testEmail) != 0:
+            return "Email déjà utilisé"
+        #if username already used
+        elif len(testUsername) != 0:
+            return "Username déjà utilisé"
+        else :
+            make_query(f'INSERT INTO user (username,password,mail,age,sexe) VALUES("{username}","{pswd1}","{email}","{age}","{sexe}")',True)
+            return "Inscription OK"        
 
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
