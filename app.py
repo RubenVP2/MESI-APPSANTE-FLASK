@@ -37,19 +37,18 @@ def index():
 @app.route('/login', methods={"GET", "POST"})
 def login():
     if request.method == "POST":
-        make_query(f'DELETE FROM user WHERE username = "jose"',True)
-        content = request.json
+        content = request.get_json()
         username = content['username']
         pswd = content['password']
         db = get_db()
         mdp = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
         # conditions to check password and mail
         if (len(mdp) == 0):
-            return "Username incorrect"
+            return json.dumps({"message": "Username incorreect"})
         elif check_password_hash(mdp[0]['password'], pswd):
-            return "Authentification ok"
+            return json.dumps({"message": "Connexion réussie", "user" : username})
         else:
-            return 'Mot de passe incorrect'
+            return json.dumps({"message": "Mot de passe incorrect"})
 
 #Insert a new user
 @app.route("/register", methods={"GET", "POST"})
@@ -68,13 +67,13 @@ def inscription():
         testUsername = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
         # if email already used
         if len(testEmail) != 0:
-            return "Email déjà utilisé"
+            return json.dumps({"message": "Email déjà utilisé"})
         #if username already used
         elif len(testUsername) != 0:
-            return "Username déjà utilisé"
+            return json.dumps({"message": "Username déjà utilisé"})
         else :
             make_query(f'INSERT INTO user (username,password,mail,age,sexe) VALUES("{username}","{pswd1}","{email}","{age}","{sexe}")',True)
-            return "Inscription OK"        
+            return json.dumps({"message": "Inscription réussie"})     
 
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
