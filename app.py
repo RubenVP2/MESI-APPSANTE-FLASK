@@ -44,9 +44,9 @@ def login():
         mdp = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
         # conditions to check password and mail
         if (len(mdp) == 0):
-            return json.dumps({"message": "Username incorreect"})
+            return json.dumps({"message": "Username incorrect"})
         elif check_password_hash(mdp[0]['password'], pswd):
-            return json.dumps({"message": "Connexion réussie", "user" : username})
+            return json.dumps({"message": "Connexion réussie", "user" : username}) #return token
         else:
             return json.dumps({"message": "Mot de passe incorrect"})
 
