@@ -83,6 +83,7 @@ CREATE TABLE "USER" (
     "id_user" INTEGER PRIMARY KEY AUTOINCREMENT,
     "username" VARCHAR(50),
     "password" VARCHAR,
+    "isAdmin" BOOLEAN,
     "mail" VARCHAR(250),
     "sexe" VARCHAR(50),
     "age" INT,
@@ -128,6 +129,7 @@ CREATE TABLE "GOAL" (
 INSERT INTO USER (
         username,
         password,
+        isAdmin,
         mail,
         sexe,
         age,
@@ -137,6 +139,7 @@ INSERT INTO USER (
 VALUES (
         'ruben',
         'lesuperbemotdepassederuben',
+        0,
         'ruben@gmail.com',
         'Homme',
         20,
@@ -146,6 +149,7 @@ VALUES (
     (
         'antoine',
         'monmotdepassimpossibleatrouver',
+        1,
         'antoinebouardain@gmail.com',
         'Homme',
         20,

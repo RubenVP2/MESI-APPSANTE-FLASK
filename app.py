@@ -76,10 +76,27 @@ def inscription():
             return json.dumps({"message": "Inscription réussie"})     
 
 @app.route("/suggestionbugtracker", methods={"POST", "GET"})
-def suggestionbugtracker():
+def allsuggestionbugtracker():
     if request.method == "GET":
         feedbacks = get_all_feedback()
         return json.dumps({"feedbacks": feedbacks})
+
+@app.route("/suggestionbugtrackerdetails/<int:id>", methods={"GET"})
+def suggestionbugtracker(id: int):
+    if request.method == "GET":
+        feedbacks = get_feedback(id)
+        return json.dumps({"feedbacks": feedbacks})
+
+@app.route("/suggestionbugtrackerdetails/<int:id>/delete", methods={"POST"})
+def suggestionbugtrackerDelete(id: int):
+    content = request.get_json()
+    username = content['username']
+    if get_role_user(username)[0]["isAdmin"] == 1:
+        delete_feedback(id)
+        return json.dumps({"message" : "Suppresion réussie"})
+    else :
+        return json.dumps({"message" : "Impossible de supprimer si vous n'êtes pas admin"})
+
 
 
 
@@ -123,13 +140,23 @@ def get_all_users():
     """ Return information of all the user """
     return make_query(
         f"""
-        SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements
+        SELECT username, password,isAdmin, mail, sexe, age, reminderweight, remindermeasurements
         FROM USER""",
         0,
     )
 
+def get_role_user(username: str):
+    """ Return role of the user """
+    return make_query(
+        f"""
+        SELECT isAdmin 
+        FROM USER
+        WHERE username = '{username}' """,
+        0,
+    )
+
 def get_all_feedback():
-    """ Return information of all the suggestion bug tracker """
+    """ Return information of all the feedbacks """
     return make_query(
         f"""
         SELECT id, nature, title, description, date, etat, feedback.id_user, user.username, user.mail
@@ -138,6 +165,24 @@ def get_all_feedback():
         0,
     )
 
+def get_feedback(idFeedback: int):
+    """ Return information of one feedback """
+    return make_query(
+        f"""
+        SELECT id, nature, title, description, date, etat, feedback.id_user, user.username, user.mail
+        FROM feedback
+        LEFT JOIN user on user.id_user = feedback.id_user
+        WHERE id = {idFeedback}""",
+        0,
+    )
+
+def delete_feedback(idFeedback: int):
+    """ Delete the feedback """
+    return make_query(
+        f""" DELETE from feedback 
+        WHERE id = {idFeedback}""",
+        1,
+    )
 
 def get_user(idUser: int):
     """ Return information of the user """
