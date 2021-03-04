@@ -41,7 +41,7 @@ def login():
         username = content['username']
         pswd = content['password']
         db = get_db()
-        mdp = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
+        mdp = login(username)
         # conditions to check password and mail
         if (len(mdp) == 0):
             return json.dumps({"message": "Username incorrect"})
@@ -63,8 +63,8 @@ def inscription():
         pswd1 = generate_password_hash(content['password'])
         db = get_db()
         # check if one user already uses this email
-        testEmail = make_query(f'SELECT password FROM user WHERE mail = "{email}"',0)
-        testUsername = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
+        testEmail = tryEmail(email)
+        testUsername = tryUsername(username)
         # if email already used
         if len(testEmail) != 0:
             return json.dumps({"message": "Email déjà utilisé"})
@@ -72,8 +72,15 @@ def inscription():
         elif len(testUsername) != 0:
             return json.dumps({"message": "Username déjà utilisé"})
         else :
-            make_query(f'INSERT INTO user (username,password,mail,age,sexe) VALUES("{username}","{pswd1}","{email}","{age}","{sexe}")',True)
+            register(username, pswd1, email, age, sexe)
             return json.dumps({"message": "Inscription réussie"})     
+
+@app.route("/suggestionbugtracker", methods={"POST", "GET"})
+def suggestionbugtracker():
+    if request.method == "GET":
+        feedbacks = get_all_feedback()
+        return json.dumps({"feedbacks": feedbacks})
+
 
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
@@ -121,6 +128,16 @@ def get_all_users():
         0,
     )
 
+def get_all_feedback():
+    """ Return information of all the suggestion bug tracker """
+    return make_query(
+        f"""
+        SELECT id, nature, title, description, date, etat, feedback.id_user, user.username, user.mail
+        FROM feedback
+        LEFT JOIN user on user.id_user = feedback.id_user""",
+        0,
+    )
+
 
 def get_user(idUser: int):
     """ Return information of the user """
@@ -130,6 +147,30 @@ def get_user(idUser: int):
         FROM USER
         WHERE id_user = {idUser}""",
         0,
+    )
+
+def login(username: str):
+    """ Return password of the username """
+    return make_query(
+        f'SELECT password FROM user WHERE username = "{username}"',0
+    )
+
+def register(username: str, pswd1: str, email: str, age: int, sexe: str):
+    """ add user """
+    return make_query(
+        f'INSERT INTO user (username,password,mail,age,sexe) VALUES("{username}","{pswd1}","{email}","{age}","{sexe}")',True
+    )
+
+def tryEmail(email: str):
+    """ return id_user if the mail exist """
+    return make_query(
+        f'SELECT id_user FROM user WHERE mail = "{email}"',0
+    )
+
+def tryUsername(username: str):
+    """ return id_user if the username exist """
+    return make_query(
+        f'SELECT password FROM user WHERE username = "{username}"',0
     )
 
 

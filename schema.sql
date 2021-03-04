@@ -162,3 +162,15 @@ INSERT INTO EXERCICE (
     )
 VALUES ('Pompes', '', 15, 4, 45, 120),
     ('Tractions', '', 12, 4, 45, 120);
+
+INSERT INTO FEEDBACK (
+        nature,
+        title,
+        description,
+        date,
+        etat,
+        id_user
+    )
+VALUES ('Bug', 'Bug Suivi Eau','description bug suivi eau', '2021-03-04 14:59:07' ,'Ouvert',1),
+    ('Suggestion', 'Forum', 'description forum', '2021-03-04 14:59:07','En cours de traitement',2),
+    ('Bug', 'Bug Connexion', 'description bug suivi eau', '2021-03-04 14:59:07','Fermé',null);
