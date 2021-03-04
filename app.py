@@ -34,7 +34,7 @@ def after_request(response):
 def index():
     return json.dumps({"username": "ruebn"})
 
-@app.route('/login', methods={"GET", "POST"})
+@app.route('/login', methods={"POST"})
 def login():
     if request.method == "POST":
         content = request.get_json()
@@ -51,7 +51,7 @@ def login():
             return json.dumps({"message": "Mot de passe incorrect"})
 
 #Insert a new user
-@app.route("/register", methods={"GET", "POST"})
+@app.route("/register", methods={"POST"})
 def inscription():
     if request.method == "POST":
         content = request.get_json()
