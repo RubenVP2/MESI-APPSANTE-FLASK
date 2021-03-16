@@ -12,10 +12,8 @@ DROP TABLE IF EXISTS FEEDBACK;
 DROP TABLE IF EXISTS SPORTS_PROGRAM;
 DROP TABLE IF EXISTS MEANSUREMENTS;
 DROP TABLE IF EXISTS GOAL;
-
-
--- A FAIRE ! ! ! ! ! Confirmer les typages + Rajouter AUTOINCREMENT
-
+-- A FAIRE ! ! ! ! ! Confirmer les typages 
+-- Creation des tables 
 CREATE TABLE "MADE_WORK" (
     "id_muscle" INT,
     "id_exercice" INT,
@@ -24,29 +22,26 @@ CREATE TABLE "MADE_WORK" (
     FOREIGN KEY ("id_exercice") REFERENCES "EXERCICE" ("id_exercice")
 );
 CREATE TABLE "MUSCLE" (
-    "id_muscle" INT(42),
-    "name" VARCHAR,
-    PRIMARY KEY ("id_muscle")
+    "id_muscle" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" VARCHAR
 );
 CREATE TABLE "PROFIL" (
-    "id_profil" INT,
+    "id_profil" INTEGER PRIMARY KEY AUTOINCREMENT,
     "food" VARCHAR,
     "activitysport" VARCHAR,
     "activitypro" VARCHAR,
     "date" DATETIME,
     "id_user" BIGINT,
-    PRIMARY KEY ("id_profil"),
     FOREIGN KEY ("id_user") REFERENCES "USER" ("id_user")
 );
 CREATE TABLE "EXERCICE" (
-    "id_exercice" INT,
+    "id_exercice" INTEGER PRIMARY KEY AUTOINCREMENT,
     "title" VARCHAR,
     "imagehelp" VARCHAR,
     "nbreps" SMALLINT,
     "nbseries" SMALLINT,
     "restseries" VARCHAR,
-    "restexercice" VARCHAR,
-    PRIMARY KEY ("id_exercice")
+    "restexercice" VARCHAR
 );
 CREATE TABLE "USED" (
     "id_user" BIGINT,
@@ -97,40 +92,37 @@ CREATE TABLE "USER" (
     FOREIGN KEY ("id_goal") REFERENCES "GOAL" ("id_goal")
 );
 CREATE TABLE "FEEDBACK" (
-    "id" INT,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "title" VARCHAR(50),
     "description" VARCHAR,
     "date" DATETIME,
     "id_user" BIGINT,
-    PRIMARY KEY ("id"),
     FOREIGN KEY ("id_user") REFERENCES "USER" ("id_user")
 );
 CREATE TABLE "SPORTS_PROGRAM" (
-    "id_sports_program" INT,
+    "id_sports_program" INTEGER PRIMARY KEY AUTOINCREMENT,
     "title" VARCHAR(50),
     "description" VARCHAR,
     "level" VARCHAR,
-    "creator" VARCHAR,
-    PRIMARY KEY ("id_sports_program")
+    "creator" VARCHAR
 );
 CREATE TABLE "MEANSUREMENTS" (
-    "id_meansurements" INT,
+    "id_meansurements" INTEGER PRIMARY KEY AUTOINCREMENT,
     "typemeansurements" VARCHAR,
     "valuemeansurements" VARCHAR,
     "id_user" BIGINT,
-    PRIMARY KEY ("id_meansurements"),
     FOREIGN KEY ("id_user") REFERENCES "USER" ("id_user")
 );
 CREATE TABLE "GOAL" (
-    "id_goal" INT,
+    "id_goal" INTEGER PRIMARY KEY AUTOINCREMENT,
     "calories" INT,
     "water" REAL,
     "sleep" REAL,
     "weight" REAL,
     "imc" REAL,
-    "goaltype" VARCHAR,
-    PRIMARY KEY ("id_goal")
+    "goaltype" VARCHAR
 );
+<<<<<<< HEAD
 
 
 INSERT INTO USER (username, password, mail,  sexe, age, reminderweight, remindermeasurements)
@@ -149,3 +141,43 @@ VALUES
 
 
 
+=======
+-- Insertion 
+INSERT INTO USER (
+        username,
+        password,
+        mail,
+        sexe,
+        age,
+        reminderweight,
+        remindermeasurements
+    )
+VALUES (
+        'ruben',
+        'lesuperbemotdepassederuben',
+        'ruben@gmail.com',
+        'Homme',
+        20,
+        5,
+        60
+    ),
+    (
+        'antoine',
+        'monmotdepassimpossibleatrouver',
+        'antoinebouardain@gmail.com',
+        'Homme',
+        20,
+        2,
+        30
+    );
+INSERT INTO EXERCICE (
+        title,
+        imagehelp,
+        nbreps,
+        nbseries,
+        restseries,
+        restexercice
+    )
+VALUES ('Pompes', '', 15, 4, 45, 120),
+    ('Tractions', '', 12, 4, 45, 120);
+>>>>>>> develop

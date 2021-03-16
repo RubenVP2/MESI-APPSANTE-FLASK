@@ -1,7 +1,8 @@
 import sqlite3
 import click
 
-from flask import Flask, g, json
+from flask import Flask, g, json, request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # from flask_cors import CORS
 from flask.cli import with_appcontext
@@ -33,6 +34,47 @@ def after_request(response):
 def index():
     return json.dumps({"username": "ruebn"})
 
+@app.route('/login', methods={"POST"})
+def login():
+    if request.method == "POST":
+        content = request.get_json()
+        username = content['username']
+        pswd = content['password']
+        db = get_db()
+        mdp = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
+        # conditions to check password and mail
+        if (len(mdp) == 0):
+            return json.dumps({"message": "Username incorrect"})
+        elif check_password_hash(mdp[0]['password'], pswd):
+            return json.dumps({"message": "Connexion réussie", "user" : username}) #return token
+        else:
+            return json.dumps({"message": "Mot de passe incorrect"})
+
+#Insert a new user
+@app.route("/register", methods={"POST"})
+def inscription():
+    if request.method == "POST":
+        content = request.get_json()
+        username = content['username']
+        email = content['mail']
+        age = content['age']
+        sexe = content['sexe']
+        # For the registration we generate a hash for the password.
+        pswd1 = generate_password_hash(content['password'])
+        db = get_db()
+        # check if one user already uses this email
+        testEmail = make_query(f'SELECT password FROM user WHERE mail = "{email}"',0)
+        testUsername = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
+        # if email already used
+        if len(testEmail) != 0:
+            return json.dumps({"message": "Email déjà utilisé"})
+        #if username already used
+        elif len(testUsername) != 0:
+            return json.dumps({"message": "Username déjà utilisé"})
+        else :
+            make_query(f'INSERT INTO user (username,password,mail,age,sexe) VALUES("{username}","{pswd1}","{email}","{age}","{sexe}")',True)
+            return json.dumps({"message": "Inscription réussie"})     
+
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
 
@@ -55,6 +97,20 @@ def userWaters(idUser:int ):
     """Return in JSON Informations about user water"""
     userWater = get_watersOfUser(idUser)
     return json.dumps({"userWater": userWater})
+
+# Récupération de tout les exercices
+@app.route("/exercices")
+def exercices():
+    exercices = make_query("SELECT * FROM exercice;", 0)
+    return json.dumps({"exercices": exercices})
+
+
+# Récupération d'un exercice par id
+@app.route("/exercices/<int:id>")
+def exercices_by_id(id: int):
+    exercice = make_query(f"SELECT * FROM exercice WHERE id_exercice = {id};", 0)
+    return json.dumps({"exercice": exercice})
+
 
 """
     Partie BDD
