@@ -34,46 +34,55 @@ def after_request(response):
 def index():
     return json.dumps({"username": "ruebn"})
 
-@app.route('/login', methods={"POST"})
+
+@app.route("/login", methods={"POST"})
 def login():
     if request.method == "POST":
         content = request.get_json()
-        username = content['username']
-        pswd = content['password']
+        username = content["username"]
+        pswd = content["password"]
         db = get_db()
-        mdp = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
+        mdp = make_query(f'SELECT password FROM user WHERE username = "{username}"', 0)
         # conditions to check password and mail
-        if (len(mdp) == 0):
+        if len(mdp) == 0:
             return json.dumps({"message": "Username incorrect"})
-        elif check_password_hash(mdp[0]['password'], pswd):
-            return json.dumps({"message": "Connexion réussie", "user" : username}) #return token
+        elif check_password_hash(mdp[0]["password"], pswd):
+            return json.dumps(
+                {"message": "Connexion réussie", "user": username}
+            )  # return token
         else:
             return json.dumps({"message": "Mot de passe incorrect"})
 
-#Insert a new user
+
+# Insert a new user
 @app.route("/register", methods={"POST"})
 def inscription():
     if request.method == "POST":
         content = request.get_json()
-        username = content['username']
-        email = content['mail']
-        age = content['age']
-        sexe = content['sexe']
+        username = content["username"]
+        email = content["mail"]
+        age = content["age"]
+        sexe = content["sexe"]
         # For the registration we generate a hash for the password.
-        pswd1 = generate_password_hash(content['password'])
+        pswd1 = generate_password_hash(content["password"])
         db = get_db()
         # check if one user already uses this email
-        testEmail = make_query(f'SELECT password FROM user WHERE mail = "{email}"',0)
-        testUsername = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
+        testEmail = make_query(f'SELECT password FROM user WHERE mail = "{email}"', 0)
+        testUsername = make_query(
+            f'SELECT password FROM user WHERE username = "{username}"', 0
+        )
         # if email already used
         if len(testEmail) != 0:
             return json.dumps({"message": "Email déjà utilisé"})
-        #if username already used
+        # if username already used
         elif len(testUsername) != 0:
             return json.dumps({"message": "Username déjà utilisé"})
-        else :
-            make_query(f'INSERT INTO user (username,password,mail,age,sexe) VALUES("{username}","{pswd1}","{email}","{age}","{sexe}")',True)
-            return json.dumps({"message": "Inscription réussie"})     
+        else:
+            make_query(
+                f'INSERT INTO user (username,password,mail,age,sexe) VALUES("{username}","{pswd1}","{email}","{age}","{sexe}")',
+                True,
+            )
+            return json.dumps({"message": "Inscription réussie"})
 
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
@@ -100,10 +109,23 @@ def exercices():
     return json.dumps({"exercices": exercices})
 
 
-# Récupération d'un exercice par id
-@app.route("/exercices/<int:id>")
-def exercices_by_id(id: int):
-    exercice = make_query(f"SELECT * FROM exercice WHERE id_exercice = {id};", 0)
+# Récupération d'un exercice par id ou nom
+@app.route("/exercice", methods=["GET"])
+def exercices_by_id_or_names():
+    """
+    Cette méthode renvoie l'exercice voulu par l'id ou le nom spécifié en paramètre pour rappel : ?name= ou ?id=
+    """
+    if request.method == "GET":
+        if request.args.get("id"):
+            id = request.args.get("id")
+            exercice = make_query(
+                f"SELECT * FROM exercice WHERE id_exercice = {id};", 0
+            )
+        else:
+            title = request.args.get("title").lower()
+            exercice = make_query(
+                f"SELECT * FROM exercice WHERE LOWER(title) = '{title}' ;", 0
+            )
     return json.dumps({"exercice": exercice})
 
 
