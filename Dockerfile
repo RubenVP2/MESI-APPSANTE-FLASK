@@ -1,4 +1,4 @@
-FROM python:3.7.1-alpine
+FROM python:3.9.6-alpine
 
 ENV FLASK_APP "app.py"
 ENV FLASK_DEBUG True
