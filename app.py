@@ -87,15 +87,31 @@ def suggestionbugtracker(id: int):
         feedbacks = get_feedback(id)
         return json.dumps({"feedbacks": feedbacks})
 
-@app.route("/suggestionbugtrackerdetails/<int:id>/delete", methods={"POST"})
-def suggestionbugtrackerDelete(id: int):
+@app.route("/suggestionbugtrackerdetails/delete", methods={"POST"})
+def suggestionbugtrackerDelete():
     content = request.get_json()
     username = content['username']
-    if get_role_user(username)[0]["isAdmin"] == 1:
-        delete_feedback(id)
-        return json.dumps({"message" : "Suppresion réussie"})
-    else :
-        return json.dumps({"message" : "Impossible de supprimer si vous n'êtes pas admin"})
+    idFeedback = content['idFeedback']
+    if 0 < len(get_role_user(username)) :
+        if get_role_user(username)[0]["isAdmin"] == 1:
+            delete_feedback(idFeedback)
+            return json.dumps({"message" : "Suppresion réussie"})
+        else :
+            return json.dumps({"message" : "Impossible de supprimer si vous n'êtes pas admin"})
+    return json.dumps({"message" : "L'utilisateur n'existe pas"})
+
+@app.route("/suggestionbugtrackerdetails/add", methods={"POST"})
+def suggestionbugtrackerAdd():
+    if request.method == "POST":
+        content = request.get_json()
+        nature = content['nature']
+        title = content['title']
+        description = content['description']
+        username = content['username']
+        id_user = get_id_user(username)
+        db = get_db()
+        add_feedback(nature, title, description, id_user)
+        return json.dumps({"message": "Feedback envoyé"})     
 
 
 
@@ -184,6 +200,12 @@ def delete_feedback(idFeedback: int):
         1,
     )
 
+def add_feedback(nature: str, title: str, description: str, id_user: int):
+    """ Add the feedback """
+    return make_query(
+        f'INSERT INTO feedback (nature,title,description,date,etat, id_user) VALUES("{nature}","{title}","{description}",datetime(\'now\',\'+1 hours\'),"Ouvert", "{id_user[0]["id_user"]}")',1
+    )
+
 def get_user(idUser: int):
     """ Return information of the user """
     return make_query(
@@ -191,6 +213,16 @@ def get_user(idUser: int):
         SELECT username, password, mail, sexe, age, reminderweight, remindermeasurements
         FROM USER
         WHERE id_user = {idUser}""",
+        0,
+    )
+
+def get_id_user(username: str):
+    """ Return information of the user """
+    return make_query(
+        f"""
+        SELECT id_user
+        FROM USER
+        WHERE username = '{username}'""",
         0,
     )
 

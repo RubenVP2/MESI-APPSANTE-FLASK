@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS FEEDBACK;
 DROP TABLE IF EXISTS SPORTS_PROGRAM;
 DROP TABLE IF EXISTS MEANSUREMENTS;
 DROP TABLE IF EXISTS GOAL;
--- A FAIRE ! ! ! ! ! Confirmer les typages 
+-- TODO : Confirmer les typages 
 -- Creation des tables 
 CREATE TABLE "MADE_WORK" (
     "id_muscle" INT,
