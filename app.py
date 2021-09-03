@@ -114,6 +114,8 @@ def suggestionbugtrackerAdd():
         description = content['description']
         username = content['username']
         id_user = get_id_user(username)
+        if len(id_user)==0 :
+            return json.dumps({"message" : "L'utilisateur n'existe pas"})
         db = get_db()
         add_feedback(nature, title, description, id_user)
         return json.dumps({"message": "Feedback envoyé"})     
