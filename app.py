@@ -73,20 +73,24 @@ def inscription():
             return json.dumps({"message": "Username déjà utilisé"})
         else :
             register(username, pswd1, email, age, sexe)
-            return json.dumps({"message": "Inscription réussie"})     
-
+            return json.dumps({"message": "Inscription réussie"})
+    
+# Récupére toutes les feedbacks
 @app.route("/suggestionbugtracker", methods={"POST", "GET"})
 def allsuggestionbugtracker():
     if request.method == "GET":
         feedbacks = get_all_feedback()
         return json.dumps({"feedbacks": feedbacks})
 
+# Récupéré une feedback
+# param : id(int)
 @app.route("/suggestionbugtrackerdetails/<int:id>", methods={"GET"})
 def suggestionbugtracker(id: int):
     if request.method == "GET":
         feedbacks = get_feedback(id)
         return json.dumps({"feedbacks": feedbacks})
 
+# Supprimer une feedback
 @app.route("/suggestionbugtrackerdetails/delete", methods={"POST"})
 def suggestionbugtrackerDelete():
     content = request.get_json()
@@ -100,6 +104,7 @@ def suggestionbugtrackerDelete():
             return json.dumps({"message" : "Impossible de supprimer si vous n'êtes pas admin"})
     return json.dumps({"message" : "L'utilisateur n'existe pas"})
 
+# Ajoute une feedback
 @app.route("/suggestionbugtrackerdetails/add", methods={"POST"})
 def suggestionbugtrackerAdd():
     if request.method == "POST":
@@ -114,7 +119,18 @@ def suggestionbugtrackerAdd():
         return json.dumps({"message": "Feedback envoyé"})     
 
 
+# Récupération de tout les exercices
+@app.route("/exercices")
+def exercices():
+    exercices = make_query("SELECT * FROM exercice;", 0)
+    return json.dumps({"exercices": exercices})
 
+
+# Récupération d'un exercice par id
+@app.route("/exercices/<int:id>")
+def exercices_by_id(id: int):
+    exercice = make_query(f"SELECT * FROM exercice WHERE id_exercice = {id};", 0)
+    return json.dumps({"exercice": exercice})
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
 
@@ -131,20 +147,6 @@ def user(idUser: int):
     """ Return in JSON informations about the user """
     user = get_user(idUser)
     return json.dumps({"user": user})
-
-
-# Récupération de tout les exercices
-@app.route("/exercices")
-def exercices():
-    exercices = make_query("SELECT * FROM exercice;", 0)
-    return json.dumps({"exercices": exercices})
-
-
-# Récupération d'un exercice par id
-@app.route("/exercices/<int:id>")
-def exercices_by_id(id: int):
-    exercice = make_query(f"SELECT * FROM exercice WHERE id_exercice = {id};", 0)
-    return json.dumps({"exercice": exercice})
 
 
 """
