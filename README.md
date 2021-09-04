@@ -1,5 +1,6 @@
 # MESI-APPSANTE-FLASK
 Api de l'application APPSANTE pour le projet MESI.  
+
 [![CI](https://github.com/RubenVP2/MESI-APPSANTE-FLASK/actions/workflows/main.yml/badge.svg)](https://github.com/RubenVP2/MESI-APPSANTE-FLASK/actions/workflows/main.yml)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=bugs)](https://sonarcloud.io/dashboard?id=Mesi-flask)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=code_smells)](https://sonarcloud.io/dashboard?id=Mesi-flask)
