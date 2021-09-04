@@ -34,6 +34,18 @@ def after_request(response):
 def index():
     return json.dumps({"username": "ruebn"})
 
+# Envoie le role de l'utilisateur
+@app.route('/isAdmin', methods={"POST"})
+def isAdmin():
+    content = request.get_json()
+    username = content['username']
+    db = get_db()
+    role = get_role_user(username)
+    if (len(role) == 0) :
+        return json.dumps({"message" : "Cet utilisateur n'existe pas"})
+    return json.dumps({"role": role})
+
+
 @app.route('/login', methods={"POST"})
 def login():
     if request.method == "POST":
