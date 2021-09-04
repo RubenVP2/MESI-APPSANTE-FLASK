@@ -88,7 +88,7 @@ def inscription():
             return json.dumps({"message": "Inscription réussie"})
     
 # Récupére toutes les feedbacks
-@app.route("/suggestionbugtracker", methods={"POST", "GET"})
+@app.route("/feedbacks", methods={"POST", "GET"})
 def allsuggestionbugtracker():
     if request.method == "GET":
         feedbacks = get_all_feedback()
@@ -96,7 +96,7 @@ def allsuggestionbugtracker():
 
 # Récupéré une feedback
 # param : id(int)
-@app.route("/suggestionbugtrackerdetails/<int:id>", methods={"GET"})
+@app.route("/feedbacksdetails/<int:id>", methods={"GET"})
 def suggestionbugtracker(id: int):
     if request.method == "GET":
         feedbacks = get_feedback(id)
@@ -105,7 +105,7 @@ def suggestionbugtracker(id: int):
         return json.dumps({"feedbacks": feedbacks})
 
 # Supprimer une feedback
-@app.route("/suggestionbugtrackerdetails/delete", methods={"POST"})
+@app.route("/feedbacksdetails/delete", methods={"POST"})
 def suggestionbugtrackerDelete():
     content = request.get_json()
     username = content['username']
@@ -113,13 +113,13 @@ def suggestionbugtrackerDelete():
     if 0 < len(get_role_user(username)) :
         if get_role_user(username)[0]["isAdmin"] == 1:
             delete_feedback(idFeedback)
-            return json.dumps({"message" : "Suppresion réussie"})
+            return json.dumps({"message" : "Action réussie"})
         else :
             return json.dumps({"message" : "Impossible de supprimer si vous n'êtes pas admin"})
     return json.dumps({"message" : "L'utilisateur n'existe pas"})
 
 # Modifier une feedback
-@app.route("/suggestionbugtrackerdetails/update", methods={"POST"})
+@app.route("/feedbacksdetails/update", methods={"POST"})
 def suggestionbugtrackerUpdate():
     content = request.get_json()
     username = content['username']
@@ -128,13 +128,13 @@ def suggestionbugtrackerUpdate():
     if 0 < len(get_role_user(username)) :
         if get_role_user(username)[0]["isAdmin"] == 1:
             update_feedback(idFeedback,state)
-            return json.dumps({"message" : "Modification réussie"})
+            return json.dumps({"message" : "Action réussie"})
         else :
             return json.dumps({"message" : "Impossible de modifier si vous n'êtes pas admin"})
     return json.dumps({"message" : "L'utilisateur n'existe pas"})
 
 # Ajoute une feedback
-@app.route("/suggestionbugtrackerdetails/add", methods={"POST"})
+@app.route("/feedbacksdetails/add", methods={"POST"})
 def suggestionbugtrackerAdd():
     if request.method == "POST":
         content = request.get_json()
