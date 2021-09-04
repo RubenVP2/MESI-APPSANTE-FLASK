@@ -1,9 +1,21 @@
 # MESI-APPSANTE-FLASK
-Api de l'application APPSANTE pour le projet MESI. 
+Api de l'application APPSANTE pour le projet MESI.  
 
-## Etapes
+[![CI](https://github.com/RubenVP2/MESI-APPSANTE-FLASK/actions/workflows/main.yml/badge.svg)](https://github.com/RubenVP2/MESI-APPSANTE-FLASK/actions/workflows/main.yml)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=bugs)](https://sonarcloud.io/dashboard?id=Mesi-flask)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=code_smells)](https://sonarcloud.io/dashboard?id=Mesi-flask)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=ncloc)](https://sonarcloud.io/dashboard?id=Mesi-flask)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=Mesi-flask)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=security_rating)](https://sonarcloud.io/dashboard?id=Mesi-flask)
 
-1. Créer son environnement virtuel : python3 -m venv venv
-2. Activer l'environnement
-3. Mettre en place les variables d'environnement FLASK_APP et FLASK_ENV
-4. Initialiser la bdd
+## Installation
+
+1. Créer son environnement virtuel :  
+`python3 -m venv venv`
+2. Activer l'environnement  
+Windows : `env\Scripts\activate.bat` 
+Linux/MacOS : `source myvenv/bin/activate`
+4. Installer les dépendances
+`pip install flask`
+6. Mettre en place les variables d'environnement FLASK_APP et FLASK_ENV
+7. Initialiser la bdd
