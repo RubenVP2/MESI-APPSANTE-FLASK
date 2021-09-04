@@ -104,6 +104,21 @@ def suggestionbugtrackerDelete():
             return json.dumps({"message" : "Impossible de supprimer si vous n'êtes pas admin"})
     return json.dumps({"message" : "L'utilisateur n'existe pas"})
 
+# Modifier une feedback
+@app.route("/suggestionbugtrackerdetails/update", methods={"POST"})
+def suggestionbugtrackerUpdate():
+    content = request.get_json()
+    username = content['username']
+    idFeedback = content['idFeedback']
+    state = content['state']
+    if 0 < len(get_role_user(username)) :
+        if get_role_user(username)[0]["isAdmin"] == 1:
+            update_feedback(idFeedback,state)
+            return json.dumps({"message" : "Modification réussie"})
+        else :
+            return json.dumps({"message" : "Impossible de modifier si vous n'êtes pas admin"})
+    return json.dumps({"message" : "L'utilisateur n'existe pas"})
+
 # Ajoute une feedback
 @app.route("/suggestionbugtrackerdetails/add", methods={"POST"})
 def suggestionbugtrackerAdd():
@@ -118,8 +133,7 @@ def suggestionbugtrackerAdd():
             return json.dumps({"message" : "L'utilisateur n'existe pas"})
         db = get_db()
         add_feedback(nature, title, description, id_user)
-        return json.dumps({"message": "Feedback envoyé"})     
-
+        return json.dumps({"message": "Feedback envoyé"})   
 
 # Récupération de tout les exercices
 @app.route("/exercices")
@@ -208,6 +222,15 @@ def add_feedback(nature: str, title: str, description: str, id_user: int):
     """ Add the feedback """
     return make_query(
         f'INSERT INTO feedback (nature,title,description,date,etat, id_user) VALUES("{nature}","{title}","{description}",datetime(\'now\',\'+1 hours\'),"Ouvert", "{id_user[0]["id_user"]}")',1
+    )
+
+def update_feedback(idFeedback: int, state: str):
+    """ Update the feedback """
+    return make_query(
+        f""" UPDATE feedback
+        SET etat = '{state}'
+        WHERE id = {idFeedback}""",
+        1,
     )
 
 def get_user(idUser: int):
