@@ -199,5 +199,21 @@ def init_db_command():
     click.echo("Initialized the database.")
 
 
+def init_data():
+    """ Injection des données dans la base """
+    db = get_db()
+    with app.open_resource("data.sql") as f:
+        db.executescript(f.read().decode("utf-8-sig"))
+
+
+@click.command("init-data")
+@with_appcontext
+def init_data_command():
+    """ Execute script insert des données """
+    init_data()
+    click.echo("Data set.")
+
+
 app.teardown_appcontext(close_db)
 app.cli.add_command(init_db_command)
+app.cli.add_command(init_data_command)

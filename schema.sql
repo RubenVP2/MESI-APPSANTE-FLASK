@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS FEEDBACK;
 DROP TABLE IF EXISTS SPORTS_PROGRAM;
 DROP TABLE IF EXISTS MEANSUREMENTS;
 DROP TABLE IF EXISTS GOAL;
+DROP TABLE IF EXISTS ALIMENT;
 -- A FAIRE ! ! ! ! ! Confirmer les typages 
 -- Creation des tables 
 CREATE TABLE "MADE_WORK" (
@@ -122,41 +123,12 @@ CREATE TABLE "GOAL" (
     "imc" REAL,
     "goaltype" VARCHAR
 );
--- Insertion 
-INSERT INTO USER (
-        username,
-        password,
-        mail,
-        sexe,
-        age,
-        reminderweight,
-        remindermeasurements
-    )
-VALUES (
-        'ruben',
-        'lesuperbemotdepassederuben',
-        'ruben@gmail.com',
-        'Homme',
-        20,
-        5,
-        60
-    ),
-    (
-        'antoine',
-        'monmotdepassimpossibleatrouver',
-        'antoinebouardain@gmail.com',
-        'Homme',
-        20,
-        2,
-        30
-    );
-INSERT INTO EXERCICE (
-        title,
-        imagehelp,
-        nbreps,
-        nbseries,
-        restseries,
-        restexercice
-    )
-VALUES ('Pompes', '', 15, 4, 45, 120),
-    ('Tractions', '', 12, 4, 45, 120);
+CREATE TABLE ALIMENT(
+Id DOUBLE,
+Nom VARCHAR(100),
+Categorie VARCHAR(100),
+Densit VARCHAR(100),
+Unite VARCHAR(100),
+energie VARCHAR(100),
+calories DOUBLE
+);
