@@ -88,6 +88,8 @@ def allsuggestionbugtracker():
 def suggestionbugtracker(id: int):
     if request.method == "GET":
         feedbacks = get_feedback(id)
+        if (len(get_feedback(id)) == 0) :
+            return json.dumps({"message" : "Ce feedback n'existe pas"})
         return json.dumps({"feedbacks": feedbacks})
 
 # Supprimer une feedback
