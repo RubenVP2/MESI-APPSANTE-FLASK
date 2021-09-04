@@ -128,6 +128,9 @@ def suggestionbugtrackerAdd():
         title = content['title']
         description = content['description']
         username = content['username']
+        if (username == None) :
+            add_feedback_without_user(nature, title, description)
+            return json.dumps({"message": "Feedback envoyé"})
         id_user = get_id_user(username)
         if len(id_user)==0 :
             return json.dumps({"message" : "L'utilisateur n'existe pas"})
@@ -216,6 +219,12 @@ def delete_feedback(idFeedback: int):
         f""" DELETE from feedback 
         WHERE id = {idFeedback}""",
         1,
+    )
+
+def add_feedback_without_user(nature: str, title: str, description: str):
+    """ Add the feedback """
+    return make_query(
+        f'INSERT INTO feedback (nature,title,description,date,etat) VALUES("{nature}","{title}","{description}",datetime(\'now\',\'+1 hours\'),"Ouvert")',1
     )
 
 def add_feedback(nature: str, title: str, description: str, id_user: int):
