@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS FEEDBACK;
 DROP TABLE IF EXISTS SPORTS_PROGRAM;
 DROP TABLE IF EXISTS MEANSUREMENTS;
 DROP TABLE IF EXISTS GOAL;
--- A FAIRE ! ! ! ! ! Confirmer les typages 
+-- TODO : Confirmer les typages 
 -- Creation des tables 
 CREATE TABLE "MADE_WORK" (
     "id_muscle" INT,
@@ -83,6 +83,7 @@ CREATE TABLE "USER" (
     "id_user" INTEGER PRIMARY KEY AUTOINCREMENT,
     "username" VARCHAR(50),
     "password" VARCHAR,
+    "isAdmin" BOOLEAN,
     "mail" VARCHAR(250),
     "sexe" VARCHAR(50),
     "age" INT,
@@ -93,9 +94,11 @@ CREATE TABLE "USER" (
 );
 CREATE TABLE "FEEDBACK" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "nature" VARCHAR,
     "title" VARCHAR(50),
     "description" VARCHAR,
     "date" DATETIME,
+    "etat" VARCHAR,
     "id_user" BIGINT,
     FOREIGN KEY ("id_user") REFERENCES "USER" ("id_user")
 );
@@ -126,6 +129,7 @@ CREATE TABLE "GOAL" (
 INSERT INTO USER (
         username,
         password,
+        isAdmin,
         mail,
         sexe,
         age,
@@ -135,6 +139,7 @@ INSERT INTO USER (
 VALUES (
         'ruben',
         'lesuperbemotdepassederuben',
+        0,
         'ruben@gmail.com',
         'Homme',
         20,
@@ -144,6 +149,7 @@ VALUES (
     (
         'antoine',
         'monmotdepassimpossibleatrouver',
+        1,
         'antoinebouardain@gmail.com',
         'Homme',
         20,
@@ -160,3 +166,15 @@ INSERT INTO EXERCICE (
     )
 VALUES ('Pompes', '', 15, 4, 45, 120),
     ('Tractions', '', 12, 4, 45, 120);
+
+INSERT INTO FEEDBACK (
+        nature,
+        title,
+        description,
+        date,
+        etat,
+        id_user
+    )
+VALUES ('Bug', 'Bug Suivi Eau','description bug suivi eau', '2021-03-04 14:59:07' ,'Ouvert',1),
+    ('Suggestion', 'Forum', 'description forum', '2021-03-04 14:59:07','En cours de traitement',2),
+    ('Bug', 'Bug Connexion', 'description bug suivi eau', '2021-03-04 14:59:07','Fermé',null);
