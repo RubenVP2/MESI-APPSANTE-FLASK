@@ -187,6 +187,39 @@ VALUES ("Ceinture abdominale"),
     ("Corps entier"),
     ("Cardio");
 
+INSERT INTO SPORTS_PROGRAM(
+    title,
+    description,
+    level,
+    creator
+)
+VALUES ("Séance Facile", "Séance pour les débutants", "Facile", "antoine"),
+       ("Séance Dificile", "Séance pour les experts", "Difficile", "Ruben");
+
+INSERT INTO HAVE(
+    id_sports_program,
+    id_exercice
+)
+VALUES(1,1),
+      (2,2);
+
+INSERT INTO MAY_HAVE_A(
+    id_user,
+    id_sports_program,
+    date
+)
+VALUES (1,1,'2021-03-04 14:59:07'),
+       (2,2,'2021-03-09 14:59:07');
+
+INSERT INTO USED(
+    id_user,
+    id_exercice,
+    weight,
+    date
+)
+VALUES (1,1,0,'2021-09-05 14:20:07'),
+       (2,2,10,'2021-09-04 14:20:07');
+
 INSERT INTO FEEDBACK (
         nature,
         title,

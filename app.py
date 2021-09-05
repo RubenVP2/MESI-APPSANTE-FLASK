@@ -178,10 +178,67 @@ def exercicesAdd():
     restseries = content['restseries']
     restexercice = content['restexercice']
     muscle = content['muscle']    
+    id_sports_program = content['id_sports_program']
     id_muscle = get_id_muscle(muscle)
     db = get_db()
-    add_exercice(title,imagehelp,nbreps,nbseries, restseries, restexercice, id_muscle)
+    add_exercice(title,imagehelp,nbreps,nbseries, restseries, restexercice, id_muscle, id_sports_program)
     return json.dumps({"message": "Exercice créer"})   
+
+# Affichage de tout les programmes
+@app.route("/sportsprogram")
+def sportsprogram():
+    sportsprogram = get_all_sportsprogram()
+    return json.dumps({"sportsprogram": sportsprogram})
+
+# Affichage des programmes de l'utilisateur
+@app.route("/sportsprogramofuser", methods={"POST"})
+def sportsprogramofuser():
+    content = request.get_json()
+    username = content['username']
+    id_user = get_id_user(username)
+    sportsprogram = get_sportsprogram_of_user(id_user)
+    return json.dumps({"sportsprogram": sportsprogram})
+
+# Affichage des détails d'un programme
+@app.route("/sportsprogramdetails", methods={"POST"})
+def sportsprogramdetails():
+    content = request.get_json()
+    id_sports_program = content['id_sports_program']
+    sportsprogram = get_sportsprogram_withid(id_sports_program)
+    exercice = get_exercice_withidsportsprogram(id_sports_program)
+    return json.dumps({"sportsprogram": sportsprogram, "exercice" : exercice})
+
+# Création d'un programme
+@app.route("/sportsprogramdetails/add", methods={"POST"})
+def sportsprogramadd():
+    content = request.get_json()
+    title = content['title']
+    description = content['description']
+    level = content['level']
+    creator = content['creator']
+    username = content['username']
+    id_user = get_id_user(username)
+    add_sportsprogram(title, description, level, creator, id_user)
+    return json.dumps({"message" : "Programme créer"})
+
+# Suppresion d'un programme
+@app.route("/sportsprogramdetails/delete", methods={"POST"})
+def sportsprogramdelete():
+    content = request.get_json()
+    id_sports_program = content['id_sports_program']
+    delete_sportsprogram(id_sports_program)
+    return json.dumps({"message" : "Suppresion réussie"})
+
+# Update d'un programme
+@app.route("/sportsprogramdetails/update", methods={"POST"})
+def sportsprogramupdate():
+    content = request.get_json()
+    title = content['title']
+    description = content['description']
+    level = content['level']
+    id_sports_program = content['id_sports_program']
+    update_sportsprogram(id_sports_program, title,description, level)
+    return json.dumps({"message" : "Modification réussie"})
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
 
@@ -349,15 +406,99 @@ def get_id_muscle(muscle: str):
         WHERE name = '{muscle}'""",0
     )
 
-def add_exercice(title: str, imagehelp: str, nbreps: int, nbseries: int, restseries: int, restexercice: int, id_muscle: int):
+def add_exercice(title: str, imagehelp: str, nbreps: int, nbseries: int, restseries: int, restexercice: int, id_muscle: int, id_sports_program: int):
     """ create an exercice with the muscle that made work """
     make_query(
         f""" INSERT INTO exercice (title,imagehelp,nbreps,nbseries,restseries, restexercice) 
         VALUES("{title}","{imagehelp}","{nbreps}","{nbseries}","{restseries}", "{restexercice}") """,1
     )
+    make_query(
+        f""" INSERT INTO have (id_sports_program, id_exercice)
+        VALUES("{id_sports_program}",(SELECT max(id_exercice) from EXERCICE))""",1
+    )
     return make_query(
         f""" INSERT INTO made_work(id_muscle, id_exercice) 
         VALUES("{id_muscle[0]["id_muscle"]}",(SELECT max(id_exercice) from EXERCICE))""",1)
+
+def get_all_sportsprogram():
+    """ get all the sports program """
+    return make_query(
+        f""" SELECT * 
+        FROM sports_program""",0
+    )
+
+def get_sportsprogram_of_user(id_user: int):
+    """ get the sports program of the user """
+    return make_query(
+        f""" SELECT creator, description, level, title
+        FROM sports_program
+        LEFT JOIN may_have_a
+        ON sports_program.id_sports_program = may_have_a.id_sports_program
+        LEFT JOIN user
+        ON may_have_a.id_user = user.id_user
+        WHERE may_have_a.id_user = {id_user[0]["id_user"]}""",0
+    )
+
+def get_sportsprogram_withid(id_sports_program: int):
+    """ get the sports program of the id """
+    return make_query(
+        f""" SELECT creator, description, level, sports_program.title
+        FROM sports_program
+        LEFT JOIN have
+        ON sports_program.id_sports_program = have.id_sports_program
+        LEFT JOIN exercice
+        ON have.id_exercice = exercice.id_exercice
+        WHERE sports_program.id_sports_program = {id_sports_program} """,0
+    )
+
+def get_exercice_withidsportsprogram(id_sports_program: int):
+    """ get the exercices of the sports program """
+    return make_query(
+        f""" SELECT exercice.title, imagehelp, nbreps, nbseries, restseries, restexercice, muscle.name
+        FROM exercice
+        LEFT JOIN have
+        ON exercice.id_exercice = have.id_exercice
+        LEFT JOIN sports_program
+        ON sports_program.id_sports_program = have.id_sports_program
+        LEFT JOIN made_work
+        on made_work.id_exercice = exercice.id_exercice
+        LEFT JOIN muscle
+        on muscle.id_muscle = made_work.id_muscle
+        WHERE have.id_sports_program = {id_sports_program} """,0
+    )
+
+def add_sportsprogram(title: str, description: str, level: str, creator: str, id_user: int):
+    """ create a empty sportprogram """
+    make_query(
+        f""" INSERT INTO sports_program (title, description, level, creator)
+        VALUES ('{title}', '{description}', '{level}', '{creator}')""",1
+    )
+    return make_query(
+        f""" INSERT INTO may_have_a (id_user, id_sports_program, date)
+        VALUES ({id_user[0]["id_user"]}, (SELECT max(id_sports_program) from sports_program), datetime(\'now\',\'+1 hours\'))""",1
+    )
+
+def delete_sportsprogram(id_sports_program: int):
+    """ delete a sportprogram """
+    make_query(
+        f""" DELETE FROM may_have_a 
+        WHERE id_sports_program = {id_sports_program}""",1
+    )
+    return make_query(
+        f""" DELETE FROM sports_program
+        WHERE id_sports_program = {id_sports_program}""",1
+    )
+
+def update_sportsprogram(id_sports_program: int, title: str, description: str, level: str):
+    """ update a sportprogram """
+    print(f"""UPDATE sports_program
+        SET title = '{title}', description = '{description}', level = '{level}'
+        WHERE id_sports_program = {id_sports_program}""")
+    return make_query(
+        f""" UPDATE sports_program
+        SET title = '{title}', description = '{description}', level = '{level}'
+        WHERE id_sports_program = {id_sports_program}""",1
+    )
 
 def make_query(query: str, needCommit: bool):
     """ Execute la requête passé en paramètre """
