@@ -196,6 +196,8 @@ def sportsprogramofuser():
     content = request.get_json()
     username = content['username']
     id_user = get_id_user(username)
+    if (len(get_id_user(username)) == 0):
+        return json.dumps({"message" : "Cette utilisateur n'existe pas"})
     sportsprogram = get_sportsprogram_of_user(id_user)
     return json.dumps({"sportsprogram": sportsprogram})
 
@@ -206,6 +208,8 @@ def sportsprogramdetails():
     id_sports_program = content['id_sports_program']
     sportsprogram = get_sportsprogram_withid(id_sports_program)
     exercice = get_exercice_withidsportsprogram(id_sports_program)
+    if (len(get_sportsprogram_withid(id_sports_program)) == 0) :
+        return json.dumps({"message" : "Ce programme sportif n'existe pas"})
     return json.dumps({"sportsprogram": sportsprogram, "exercice" : exercice})
 
 # Création d'un programme
