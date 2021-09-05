@@ -155,15 +155,33 @@ def suggestionbugtrackerAdd():
 # Récupération de tout les exercices
 @app.route("/exercices")
 def exercices():
-    exercices = make_query("SELECT * FROM exercice;", 0)
+    exercices = get_all_exercices()
     return json.dumps({"exercices": exercices})
 
 
 # Récupération d'un exercice par id
 @app.route("/exercices/<int:id>")
 def exercices_by_id(id: int):
-    exercice = make_query(f"SELECT * FROM exercice WHERE id_exercice = {id};", 0)
+    exercice = get_exercice(id)
+    if (len(get_exercice(id)) == 0) :
+        return json.dumps({"message" : "Cette exercice n'existe pas"})
     return json.dumps({"exercice": exercice})
+
+# Création d'un exercice
+@app.route("/exercices/add", methods={"POST"})
+def exercicesAdd():
+    content = request.get_json()
+    title = content['title']
+    imagehelp = content['imagehelp']
+    nbreps = content['nbreps']
+    nbseries = content['nbseries']
+    restseries = content['restseries']
+    restexercice = content['restexercice']
+    muscle = content['muscle']    
+    id_muscle = get_id_muscle(muscle)
+    db = get_db()
+    add_exercice(title,imagehelp,nbreps,nbseries, restseries, restexercice, id_muscle)
+    return json.dumps({"message": "Exercice créer"})   
 
 # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
 
@@ -300,6 +318,46 @@ def tryUsername(username: str):
         f'SELECT password FROM user WHERE username = "{username}"',0
     )
 
+def get_all_exercices():
+    """ return all exercices with muscle that made work """
+    return make_query(
+        f"""SELECT * 
+        FROM exercice 
+        LEFT JOIN made_work 
+        ON exercice.id_exercice = made_work.id_exercice 
+        LEFT JOIN muscle 
+        ON made_work.id_muscle = muscle.id_muscle""", 0
+    )
+
+def get_exercice(id: int):
+    """ return one exercice with muscle that made work """
+    return make_query(
+        f"""SELECT * 
+        FROM exercice 
+        LEFT JOIN made_work 
+        ON exercice.id_exercice = made_work.id_exercice 
+        LEFT JOIN muscle 
+        ON made_work.id_muscle = muscle.id_muscle
+        WHERE exercice.id_exercice = {id};""", 0
+    )
+
+def get_id_muscle(muscle: str):
+    """ return muscle with his id """
+    return make_query(
+        f""" SELECT id_muscle
+        FROM muscle
+        WHERE name = '{muscle}'""",0
+    )
+
+def add_exercice(title: str, imagehelp: str, nbreps: int, nbseries: int, restseries: int, restexercice: int, id_muscle: int):
+    """ create an exercice with the muscle that made work """
+    make_query(
+        f""" INSERT INTO exercice (title,imagehelp,nbreps,nbseries,restseries, restexercice) 
+        VALUES("{title}","{imagehelp}","{nbreps}","{nbseries}","{restseries}", "{restexercice}") """,1
+    )
+    return make_query(
+        f""" INSERT INTO made_work(id_muscle, id_exercice) 
+        VALUES("{id_muscle[0]["id_muscle"]}",(SELECT max(id_exercice) from EXERCICE))""",1)
 
 def make_query(query: str, needCommit: bool):
     """ Execute la requête passé en paramètre """

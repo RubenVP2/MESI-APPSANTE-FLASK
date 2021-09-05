@@ -167,6 +167,26 @@ INSERT INTO EXERCICE (
 VALUES ('Pompes', '', 15, 4, 45, 120),
     ('Tractions', '', 12, 4, 45, 120);
 
+INSERT INTO MADE_WORK(
+        id_muscle,
+        id_exercice
+)
+VALUES (2,1),
+    (3,2);
+
+INSERT INTO MUSCLE (
+        name
+)
+VALUES ("Ceinture abdominale"),
+    ("Bras"),
+    ("Dos"),
+    ("Pectoraux"),
+    ("Jambes"),
+    ("Epaules"),
+    ("Autre"),
+    ("Corps entier"),
+    ("Cardio");
+
 INSERT INTO FEEDBACK (
         nature,
         title,
