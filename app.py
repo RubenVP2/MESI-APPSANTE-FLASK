@@ -434,7 +434,7 @@ def get_all_sportsprogram():
 def get_sportsprogram_of_user(id_user: int):
     """ get the sports program of the user """
     return make_query(
-        f""" SELECT creator, description, level, title
+        f""" SELECT sports_program.id_sports_program, creator, description, level, title
         FROM sports_program
         LEFT JOIN may_have_a
         ON sports_program.id_sports_program = may_have_a.id_sports_program
@@ -458,7 +458,7 @@ def get_sportsprogram_withid(id_sports_program: int):
 def get_exercice_withidsportsprogram(id_sports_program: int):
     """ get the exercices of the sports program """
     return make_query(
-        f""" SELECT exercice.title, imagehelp, nbreps, nbseries, restseries, restexercice, muscle.name
+        f""" SELECT exercice.id_exercice, exercice.title, imagehelp, nbreps, nbseries, restseries, restexercice, muscle.name
         FROM exercice
         LEFT JOIN have
         ON exercice.id_exercice = have.id_exercice
