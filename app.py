@@ -129,6 +129,22 @@ def exercices_by_id_or_names():
     return json.dumps({"exercice": exercice})
 
 
+@app.route("/wellBeing/<string:username>", methods=["GET"])
+def get_well_being(username: str):
+    data = make_query(f"SELECT wb.* fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user WHERE u.username = '{username}' ORDER BY wb.date;", needCommit=False)
+    return json.dumps({'well_being': data})
+
+@app.route("/wellBeing/<string:username>/stats", methods=["GET"])
+def get_well_being_stats(username: str):
+    data = make_query(f"""SELECT wb.calories, wb.water, wb.sleep, wb.date
+                    fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user
+                    WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;""", needCommit=False)
+    data_avg = make_query(f"""SELECT round(avg(wb.calories), 0) as 'avgCalories', avg(wb.water) as 'avgWater', avg(wb.sleep) as 'avgSleep'
+                    FROM WELL_BEING wb INNER JOIN USER u on wb.id_user = u.id_user
+                    WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;
+        """, False)
+    return json.dumps({'well_being_stats': data, 'well_being_avg': data_avg})
+
 """
     Partie BDD
 """
