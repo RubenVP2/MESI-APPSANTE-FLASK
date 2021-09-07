@@ -46,16 +46,16 @@ def isAdmin():
     return json.dumps({"role": role})
 
 
-@app.route('/login', methods={"POST"})
+@app.route("/login", methods={"POST"})
 def login():
     if request.method == "POST":
         content = request.get_json()
-        username = content['username']
-        pswd = content['password']
+        username = content["username"]
+        pswd = content["password"]
         db = get_db()
         mdp = login(username)
         # conditions to check password and mail
-        if (len(mdp) == 0):
+        if len(mdp) == 0:
             return json.dumps({"message": "Username incorrect"})
         elif check_password_hash(mdp[0]['password'], pswd):
             return json.dumps({"message": "Connexion réussie", "user" : username}) #return token
@@ -86,7 +86,7 @@ def inscription():
         else :
             register(username, pswd1, email, age, sexe)
             return json.dumps({"message": "Inscription réussie"})
-    
+
 # Récupére toutes les feedbacks
 @app.route("/feedbacks", methods={"POST", "GET"})
 def allsuggestionbugtracker():
@@ -150,7 +150,7 @@ def suggestionbugtrackerAdd():
             return json.dumps({"message" : "L'utilisateur n'existe pas"})
         db = get_db()
         add_feedback(nature, title, description, id_user)
-        return json.dumps({"message": "Feedback envoyé"})   
+        return json.dumps({"message": "Feedback envoyé"})
 
 # Récupération de tout les exercices
 @app.route("/exercices")
@@ -179,12 +179,12 @@ def exercicesAdd():
     nbseries = content['nbseries']
     restseries = content['restseries']
     restexercice = content['restexercice']
-    muscle = content['muscle']    
+    muscle = content['muscle']
     id_sports_program = content['id_sports_program']
     id_muscle = get_id_muscle(muscle)
     db = get_db()
     add_exercice(title,imagehelp,nbreps,nbseries, restseries, restexercice, id_muscle, id_sports_program)
-    return json.dumps({"message": "Exercice créer"})   
+    return json.dumps({"message": "Exercice créer"})
 
 # Update d'un exercice
 @app.route("/exercice/update", methods={"POST"})
@@ -312,6 +312,49 @@ def user(idUser: int):
     user = get_user(idUser)
     return json.dumps({"user": user})
 
+
+# Récupération de tout les exercices
+@app.route("/exercices")
+def exercices():
+    exercices = make_query("SELECT * FROM exercice;", 0)
+    return json.dumps({"exercices": exercices})
+
+
+# Récupération d'un exercice par id ou nom
+@app.route("/exercice", methods=["GET"])
+def exercices_by_id_or_names():
+    """
+    Cette méthode renvoie l'exercice voulu par l'id ou le nom spécifié en paramètre pour rappel : ?name= ou ?id=
+    """
+    if request.method == "GET":
+        if request.args.get("id"):
+            id = request.args.get("id")
+            exercice = make_query(
+                f"SELECT * FROM exercice WHERE id_exercice = {id};", 0
+            )
+        else:
+            title = request.args.get("title").lower()
+            exercice = make_query(
+                f"SELECT * FROM exercice WHERE LOWER(title) = '{title}' ;", 0
+            )
+    return json.dumps({"exercice": exercice})
+
+
+@app.route("/wellBeing/<string:username>", methods=["GET"])
+def get_well_being(username: str):
+    data = make_query(f"SELECT wb.* fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user WHERE u.username = '{username}' ORDER BY wb.date;", needCommit=False)
+    return json.dumps({'well_being': data})
+
+@app.route("/wellBeing/<string:username>/stats", methods=["GET"])
+def get_well_being_stats(username: str):
+    data = make_query(f"""SELECT wb.calories, wb.water, wb.sleep, wb.date
+                    fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user
+                    WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;""", needCommit=False)
+    data_avg = make_query(f"""SELECT round(avg(wb.calories), 0) as 'avgCalories', avg(wb.water) as 'avgWater', avg(wb.sleep) as 'avgSleep'
+                    FROM WELL_BEING wb INNER JOIN USER u on wb.id_user = u.id_user
+                    WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;
+        """, False)
+    return json.dumps({'well_being_stats': data, 'well_being_avg': data_avg})
 
 """
     Partie BDD
@@ -633,5 +676,21 @@ def init_db_command():
     click.echo("Initialized the database.")
 
 
+def init_data():
+    """ Injection des données dans la base """
+    db = get_db()
+    with app.open_resource("data.sql") as f:
+        db.executescript(f.read().decode("utf-8-sig"))
+
+
+@click.command("init-data")
+@with_appcontext
+def init_data_command():
+    """ Execute script insert des données """
+    init_data()
+    click.echo("Data set.")
+
+
 app.teardown_appcontext(close_db)
 app.cli.add_command(init_db_command)
+app.cli.add_command(init_data_command)

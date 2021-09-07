@@ -20,3 +20,6 @@ Linux/MacOS : `source myvenv/bin/activate`
 `pip install flask`
 6. Mettre en place les variables d'environnement FLASK_APP et FLASK_ENV
 7. Initialiser la bdd
+  - Lancer une première fois l'application : ` flask run`
+  - Lancer la commande pour l'initialisation de la bdd : ` flask init-db`
+  - Lancer la commande pour l'injection des données : ` flask init-data`
