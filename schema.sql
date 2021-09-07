@@ -122,26 +122,6 @@ CREATE TABLE "GOAL" (
     "imc" REAL,
     "goaltype" VARCHAR
 );
-<<<<<<< HEAD
-
-
-INSERT INTO USER (username, password, mail,  sexe, age, reminderweight, remindermeasurements)
-VALUES
-  ('ruben','lesuperbemotdepassederuben', 'ruben@gmail.com', 'Homme', 20, 5, 60),
-  ('antoine','monmotdepassimpossibleatrouver', 'antoinebouardain@gmail.com', 'Homme', 20, 2, 30);
-
-INSERT INTO WELL_BEING (calories, water, sleep, size, weight, imc, date, id_user)
-VALUES
-    (127.23, 2.9, 8.20, 176.2, 67.9, 20.4, '2009-01-01', 1),
-    (127.23, 2.1, 8.20, 176.2, 67.9, 20.4, '2007-01-01', 2),
-    (111.23, 1.2, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 1),
-    (111.23, 1.9, 1.20, 111.2, 10.9, 20.4, '2011-05-01', 1),
-    (111.23, 1.9, 1.20, 111.2, 31.9, 20.4, '2011-05-01', 1),
-    (111.23, 7.9, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 1);
-
-
-
-=======
 -- Insertion 
 INSERT INTO USER (
         username,
@@ -180,4 +160,12 @@ INSERT INTO EXERCICE (
     )
 VALUES ('Pompes', '', 15, 4, 45, 120),
     ('Tractions', '', 12, 4, 45, 120);
->>>>>>> develop
+
+INSERT INTO WELL_BEING (calories, water, sleep, size, weight, imc, date, id_user)
+VALUES
+    (127.23, 2.9, 8.20, 176.2, 67.9, 20.4, '2009-01-01', 3),
+    (127.23, 2.1, 8.20, 176.2, 67.9, 20.4, '2007-01-01', 2),
+    (111.23, 1.2, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 3),
+    (111.23, 1.9, 1.20, 111.2, 10.9, 20.4, '2011-05-01', 3),
+    (111.23, 1.9, 1.20, 111.2, 31.9, 20.4, '2011-05-01', 3),
+    (111.23, 7.9, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 3);

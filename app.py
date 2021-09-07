@@ -3,11 +3,14 @@ import click
 
 from flask import Flask, g, json, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_paginate import Pagination, get_page_parameter
+from datetime import datetime
 
 # from flask_cors import CORS
 from flask.cli import with_appcontext
 
 app = Flask(__name__)
+app.debug = True
 # cors = CORS(app)
 
 
@@ -15,6 +18,8 @@ app = Flask(__name__)
 Enable CORS. Disable it if you don't need CORS
 https://parzibyte.me/blog
 """
+
+ROWS_PER_PAGE = 5
 
 
 @app.after_request
@@ -34,6 +39,7 @@ def after_request(response):
 def index():
     return json.dumps({"username": "ruebn"})
 
+
 @app.route('/login', methods={"POST"})
 def login():
     if request.method == "POST":
@@ -41,16 +47,17 @@ def login():
         username = content['username']
         pswd = content['password']
         db = get_db()
-        mdp = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
+        mdp = make_query(f'SELECT password FROM user WHERE username = "{username}"', 0)
         # conditions to check password and mail
         if (len(mdp) == 0):
             return json.dumps({"message": "Username incorrect"})
         elif check_password_hash(mdp[0]['password'], pswd):
-            return json.dumps({"message": "Connexion réussie", "user" : username}) #return token
+            return json.dumps({"message": "Connexion réussie", "user": username})  # return token
         else:
             return json.dumps({"message": "Mot de passe incorrect"})
 
-#Insert a new user
+
+# Insert a new user
 @app.route("/register", methods={"POST"})
 def inscription():
     if request.method == "POST":
@@ -63,20 +70,44 @@ def inscription():
         pswd1 = generate_password_hash(content['password'])
         db = get_db()
         # check if one user already uses this email
-        testEmail = make_query(f'SELECT password FROM user WHERE mail = "{email}"',0)
-        testUsername = make_query(f'SELECT password FROM user WHERE username = "{username}"',0)
+        testEmail = make_query(f'SELECT password FROM user WHERE mail = "{email}"', 0)
+        testUsername = make_query(f'SELECT password FROM user WHERE username = "{username}"', 0)
         # if email already used
         if len(testEmail) != 0:
             return json.dumps({"message": "Email déjà utilisé"})
-        #if username already used
+        # if username already used
         elif len(testUsername) != 0:
             return json.dumps({"message": "Username déjà utilisé"})
-        else :
-            make_query(f'INSERT INTO user (username,password,mail,age,sexe) VALUES("{username}","{pswd1}","{email}","{age}","{sexe}")',True)
-            return json.dumps({"message": "Inscription réussie"})     
+        else:
+            make_query(
+                f'INSERT INTO user (username,password,mail,age,sexe) VALUES("{username}","{pswd1}","{email}","{age}","{sexe}")',
+                True)
+            return json.dumps({"message": "Inscription réussie"})
 
 
-# Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
+# Insert a new value of water
+@app.route("/addWater", methods={"POST"})
+def addWaterHistorique():
+    if request.method == "POST":
+        content = request.get_json()
+        water = content['water']
+        date = content['date']
+        username = content['username']
+        id_user = get_id_user(username)[0]["id_user"]
+        make_query(f'INSERT INTO WELL_BEING (id_user,water,date) VALUES("{id_user}","{water}","{date}")', True)
+        return json.dumps({"message": "Insertion réussie"})
+
+
+# Update a new value of water
+@app.route("/updateWater/<int:idWaterOfWellBeing>", methods={"POST"})
+def updateWaterHistorique(idWaterOfWellBeing: int):
+    if request.method == "POST":
+        content = request.get_json()
+        water = content['water']
+        make_query(f'UPDATE WELL_BEING set water="{water}" WHERE id_well_being="{idWaterOfWellBeing}" ', True)
+        return json.dumps({"message": "Update réussie"})
+
+    # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
 
 
 @app.route("/test/user/all")
@@ -92,11 +123,23 @@ def user(idUser: int):
     user = get_user(idUser)
     return json.dumps({"user": user})
 
-@app.route("/user/water/<int:idUser>")
-def userWaters(idUser:int ):
+
+@app.route("/user/water/<string:username>")
+def userWaters(username: str):
     """Return in JSON Informations about user water"""
-    userWater = get_watersOfUser(idUser)
+    userWater = get_watersOfUser(username)
     return json.dumps({"userWater": userWater})
+
+
+@app.route("/user/water/<string:username>/filter", methods=["POST"])
+def userWatersFilter(username: str):
+    if request.method == "POST":
+        content = request.get_json()
+        dateStart = content['dateStart']
+        dateEnd = content['dateEnd']
+        userWater = get_watersOfUserFilter(username, dateStart, dateEnd)
+        return json.dumps({"message": "Filtrage réussie", "userWater": userWater})
+
 
 # Récupération de tout les exercices
 @app.route("/exercices")
@@ -127,16 +170,47 @@ def get_all_users():
     )
 
 
-def get_watersOfUser(idUser: int):
+''''def get_date_wellBeing(date: datetime.year):
+    return make_query(
+        f"""
+        SELECT date FROM WELL_BEING WHERE date = {date}""",
+        0,
+    )'''
+
+
+def get_id_user(username_id: str):
+    """ Return information of the user """
+    return make_query(
+        f"""
+        SELECT id_user
+        FROM USER
+        WHERE username = '{username_id}'""",
+        0,
+    )
+
+
+def get_watersOfUser(username: str):
     """return les enregistrements en eau d'un user"""
+    userId = get_id_user(username)[0]["id_user"]
     return make_query(
         f"""
         SELECT id_well_being,date,water, weight
         FROM WELL_BEING
-        WHERE id_user = {idUser}""",
+        WHERE id_user = {userId} order by date desc""",
         0,
-    )  
+    )
 
+
+def get_watersOfUserFilter(username: str, dateStart: datetime, dateEnd: datetime):
+    """return les enregistrements en eau d'un user"""
+    userId = get_id_user(username)[0]["id_user"]
+    return make_query(
+        f"""
+        SELECT id_well_being,date,water, weight
+        FROM WELL_BEING
+        WHERE id_user = {userId} and date between '{dateStart}' and '{dateEnd}' order by date desc""",
+        0,
+    )
 
 
 def get_user(idUser: int):
