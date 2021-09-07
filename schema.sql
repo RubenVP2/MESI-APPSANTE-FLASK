@@ -48,7 +48,7 @@ CREATE TABLE "USED" (
     "id_exercice" INT,
     "weight" REAL,
     "date" DATETIME,
-    PRIMARY KEY ("id_user", "id_exercice"),
+    PRIMARY KEY ("id_user", "id_exercice", "date"),
     FOREIGN KEY ("id_user") REFERENCES "USER" ("id_user"),
     FOREIGN KEY ("id_exercice") REFERENCES "EXERCICE" ("id_exercice")
 );

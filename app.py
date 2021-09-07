@@ -160,8 +160,10 @@ def exercices():
 
 
 # Récupération d'un exercice par id
-@app.route("/exercices/<int:id>")
-def exercices_by_id(id: int):
+@app.route("/exercicesdetails", methods={"POST"})
+def exercices_by_id():
+    content = request.get_json()
+    id = content['id_exercice']
     exercice = get_exercice(id)
     if (len(get_exercice(id)) == 0) :
         return json.dumps({"message" : "Cette exercice n'existe pas"})
@@ -183,6 +185,56 @@ def exercicesAdd():
     db = get_db()
     add_exercice(title,imagehelp,nbreps,nbseries, restseries, restexercice, id_muscle, id_sports_program)
     return json.dumps({"message": "Exercice créer"})   
+
+# Update d'un exercice
+@app.route("/exercice/update", methods={"POST"})
+def exerciceUpdate():
+    content = request.get_json()
+    id_exercice = content['id_exercice']
+    username = content['username']
+    id_user = get_id_user(username)
+    nbreps = content['nbreps']
+    nbseries = content['nbseries']
+    restseries = content['restseries']
+    restexercice = content['restexercice']
+    db = get_db()
+    update_exercice(id_exercice, id_user, nbreps, nbseries, restseries, restexercice)
+    return json.dumps({"message": "Action réussie"})
+
+# Suppresion d'un exercice
+@app.route("/exercice/delete", methods={"POST"})
+def exerciceDelete():
+    content = request.get_json()
+    id_exercice = content['id_exercice']
+    username = content['username']
+    id_user = get_id_user(username)
+    db = get_db()
+    exercice = get_exercice(id_exercice)
+    if (len(exercice) == 0):
+        return json.dumps({"message": "Cette exercice n'existe pas"})
+    delete_exercice(id_exercice, id_user)
+    return json.dumps({"message": "Action réussie"})
+
+# Affichage des cinq derniers résultats
+@app.route("/result", methods={"POST"})
+def result():
+    content = request.get_json()
+    id_exercice = content['id_exercice']
+    username = content['username']
+    id_user = get_id_user(username)
+    results = get_result(id_exercice, id_user)
+    return json.dumps({"results": results})
+
+# Créer un résultat
+@app.route("/result/add", methods={"POST"})
+def resultAdd():
+    content = request.get_json()
+    id_exercice = content['id_exercice']
+    username = content['username']
+    weight = content['weight']
+    id_user = get_id_user(username)
+    results = add_result(id_exercice, id_user, weight)
+    return json.dumps({"message": "Le résultat a été créer"})
 
 # Affichage de tout les programmes
 @app.route("/sportsprogram")
@@ -379,6 +431,23 @@ def tryUsername(username: str):
         f'SELECT password FROM user WHERE username = "{username}"',0
     )
 
+def get_result(id_exercice: int, id_user: int):
+    """ return the five last result of an exercice and user """
+    return make_query(
+        f""" SELECT * 
+        FROM used
+        WHERE id_user = {id_user[0]["id_user"]} and id_exercice = {id_exercice}
+        ORDER BY date DESC
+        LIMIT 5""",0
+    )
+
+def add_result(id_exercice: int, id_user: int, weight: int):
+    """ add a result on a exercice for a user """
+    return make_query(
+        f""" INSERT INTO used(id_user, id_exercice, weight, date) 
+        VALUES ({id_user[0]["id_user"]}, {id_exercice}, {weight}, datetime(\'now\',\'+1 hours\'))""",1
+    )
+
 def get_all_exercices():
     """ return all exercices with muscle that made work """
     return make_query(
@@ -401,6 +470,22 @@ def get_exercice(id: int):
         ON made_work.id_muscle = muscle.id_muscle
         WHERE exercice.id_exercice = {id};""", 0
     )
+
+def delete_exercice(id_exercice: int, id_user: int):
+    """ delete one exercice """
+    return make_query(
+        f""" DELETE FROM exercice
+        WHERE id_exercice = {id_exercice}""",1
+    )
+
+def update_exercice(id_exercice: int, id_user : int, nbreps: int, nbseries: int, restseries : str, restexercice: str):
+    """ update one exerice"""
+    return make_query(
+        f""" UPDATE exercice
+            SET nbreps = '{nbreps}', nbseries = '{nbseries}', restseries = '{restseries}', restexercice = '{restexercice}'
+            WHERE id_exercice = {id_exercice}""",1
+    )
+
 
 def get_id_muscle(muscle: str):
     """ return muscle with his id """
