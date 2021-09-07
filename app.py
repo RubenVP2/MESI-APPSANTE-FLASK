@@ -94,8 +94,18 @@ def addWaterHistorique():
         date = content['date']
         username = content['username']
         id_user = get_id_user(username)[0]["id_user"]
-        make_query(f'INSERT INTO WELL_BEING (id_user,water,date) VALUES("{id_user}","{water}","{date}")', True)
-        return json.dumps({"message": "Insertion réussie"})
+        userWaterTest = make_query(
+        f"""
+        SELECT id_well_being,date,water, weight
+        FROM WELL_BEING
+        WHERE id_user = {id_user} and date = '{date}' """,
+        0,
+        )
+        if not userWaterTest:
+            make_query(f'INSERT INTO WELL_BEING (id_user,water,date) VALUES("{id_user}","{water}","{date}")', True)
+            return json.dumps({"message": "Insertion réussie"})
+        else:
+            return json.dumps({"message": "Insertion déjà existante, veuillez la modifier dans le menu"})
 
 
 # Update a new value of water
