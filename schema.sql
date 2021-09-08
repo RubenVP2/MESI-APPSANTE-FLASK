@@ -128,11 +128,11 @@ CREATE TABLE "GOAL" (
     "goaltype" VARCHAR
 );
 CREATE TABLE ALIMENT(
-Id DOUBLE,
-Nom VARCHAR(100),
-Categorie VARCHAR(100),
-Densit VARCHAR(100),
-Unite VARCHAR(100),
-energie VARCHAR(100),
-calories DOUBLE
+    Id DOUBLE,
+    Nom VARCHAR(100),
+    Categorie VARCHAR(100),
+    Densit VARCHAR(100),
+    Unite VARCHAR(100),
+    energie VARCHAR(100),
+    calories DOUBLE
 );
