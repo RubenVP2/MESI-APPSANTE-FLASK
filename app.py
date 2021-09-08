@@ -517,13 +517,6 @@ def userWatersFilter(username: str):
         return json.dumps({"message": "Filtrage réussie", "userWater": userWater})
 
 
-# Récupération de tout les exercices
-@app.route("/exercices")
-def exercices():
-    exercices = make_query("SELECT * FROM exercice;", 0)
-    return json.dumps({"exercices": exercices})
-
-
 # Récupération d'un exercice par id
 @app.route("/exercices/<int:id>")
 def exercices_by_id(id: int):
@@ -677,7 +670,6 @@ def get_watersOfUserFilter(username: str, dateStart: datetime, dateEnd: datetime
     )
 
 
-def get_user(idUser: int):
 def get_weightsOfUser(username: str):
     """return les enregistrements en eau d'un user"""
     userId = get_id_user(username)[0]["id_user"]
@@ -686,8 +678,7 @@ def get_weightsOfUser(username: str):
         SELECT id_well_being,date,water, weight
         FROM WELL_BEING
         WHERE id_user = {userId} order by date desc""",
-        0,
-    )
+        0,)
 
 
 def get_weightsOfUserFilter(username: str, dateStart: datetime, dateEnd: datetime):
