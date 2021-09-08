@@ -1,7 +1,8 @@
-﻿-- Insertion 
+﻿-- Insertion
 INSERT INTO USER (
         username,
         password,
+        isAdmin,
         mail,
         sexe,
         age,
@@ -11,6 +12,7 @@ INSERT INTO USER (
 VALUES (
         'ruben',
         'lesuperbemotdepassederuben',
+        0,
         'ruben@gmail.com',
         'Homme',
         20,
@@ -20,6 +22,7 @@ VALUES (
     (
         'antoine',
         'monmotdepassimpossibleatrouver',
+        1,
         'antoinebouardain@gmail.com',
         'Homme',
         20,
@@ -36,6 +39,73 @@ INSERT INTO EXERCICE (
     )
 VALUES ('Pompes', '', 15, 4, 45, 120),
     ('Tractions', '', 12, 4, 45, 120);
+
+INSERT INTO MADE_WORK(
+        id_muscle,
+        id_exercice
+)
+VALUES (2,1),
+    (3,2);
+
+INSERT INTO MUSCLE (
+        name
+)
+VALUES ("Ceinture abdominale"),
+    ("Bras"),
+    ("Dos"),
+    ("Pectoraux"),
+    ("Jambes"),
+    ("Epaules"),
+    ("Autre"),
+    ("Corps entier"),
+    ("Cardio");
+
+INSERT INTO SPORTS_PROGRAM(
+    title,
+    description,
+    level,
+    creator
+)
+VALUES ("Séance Facile", "Séance pour les débutants", "Facile", "antoine"),
+       ("Séance Dificile", "Séance pour les experts", "Difficile", "Ruben");
+
+INSERT INTO HAVE(
+    id_sports_program,
+    id_exercice
+)
+VALUES(1,1),
+      (2,2);
+
+INSERT INTO MAY_HAVE_A(
+    id_user,
+    id_sports_program,
+    date
+)
+VALUES (1,1,'2021-03-04 14:59:07'),
+       (2,2,'2021-03-09 14:59:07');
+
+INSERT INTO USED(
+    id_user,
+    id_exercice,
+    weight,
+    date
+)
+VALUES (1,1,0,'2021-09-05 14:20:07'),
+       (2,2,10,'2021-09-04 14:20:07');
+
+INSERT INTO FEEDBACK (
+        nature,
+        title,
+        description,
+        date,
+        etat,
+        id_user
+    )
+VALUES ('Bug', 'Bug Suivi Eau','description bug suivi eau', '2021-03-04 14:59:07' ,'Ouvert',1),
+    ('Suggestion', 'Forum', 'description forum', '2021-03-04 14:59:07','En cours de traitement',2),
+    ('Bug', 'Bug Connexion', 'description bug suivi eau', '2021-03-04 14:59:07','Fermé',null);
+
+
 
 /* INSERT QUERY NO: 1 */
 INSERT INTO ALIMENT(Id, Nom, Categorie, Densit, Unite, energie, calories)

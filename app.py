@@ -313,13 +313,6 @@ def user(idUser: int):
     return json.dumps({"user": user})
 
 
-# Récupération de tout les exercices
-@app.route("/exercices")
-def exercices():
-    exercices = make_query("SELECT * FROM exercice;", 0)
-    return json.dumps({"exercices": exercices})
-
-
 # Récupération d'un exercice par id ou nom
 @app.route("/exercice", methods=["GET"])
 def exercices_by_id_or_names():
