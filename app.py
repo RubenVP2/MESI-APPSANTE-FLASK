@@ -340,13 +340,8 @@ def get_well_being(username: str):
 
 @app.route("/wellBeing/<string:username>/stats", methods=["GET"])
 def get_well_being_stats(username: str):
-    data = make_query(f"""SELECT wb.calories, wb.water, wb.sleep, wb.date
-                    fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user
-                    WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;""", needCommit=False)
-    data_avg = make_query(f"""SELECT round(avg(wb.calories), 0) as 'avgCalories', avg(wb.water) as 'avgWater', avg(wb.sleep) as 'avgSleep'
-                    FROM WELL_BEING wb INNER JOIN USER u on wb.id_user = u.id_user
-                    WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;
-        """, False)
+    data = get_well_being(username)
+    data_avg = get_well_being_stats(username)
     return json.dumps({'well_being_stats': data, 'well_being_avg': data_avg})
 
 """
@@ -623,6 +618,21 @@ def update_sportsprogram(id_sports_program: int, title: str, description: str, l
         f""" UPDATE sports_program
         SET title = '{title}', description = '{description}', level = '{level}'
         WHERE id_sports_program = {id_sports_program}""",1
+    )
+
+
+def get_well_being(username: str):
+    return make_query(
+            f"""SELECT wb.calories, wb.water, wb.sleep, wb.date
+            fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user
+            WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;""", needCommit=False)
+
+def get_well_being_stats(username: str):
+    return make_query(
+        f"""SELECT round(avg(wb.calories), 0) as 'avgCalories', avg(wb.water) as 'avgWater', avg(wb.sleep) as 'avgSleep'
+                        FROM WELL_BEING wb INNER JOIN USER u on wb.id_user = u.id_user
+                        WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;
+            """, False
     )
 
 def make_query(query: str, needCommit: bool):
