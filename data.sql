@@ -66,8 +66,8 @@ INSERT INTO SPORTS_PROGRAM(
     level,
     creator
 )
-VALUES ("Séance Facile", "Séance pour les débutants", "Facile", "antoine"),
-       ("Séance Dificile", "Séance pour les experts", "Difficile", "Ruben");
+VALUES ("Séance Facile", "Séance pour les débutants", "Facile", "ruben"),
+       ("Séance Dificile", "Séance pour les experts", "Difficile", "antoine");
 
 INSERT INTO HAVE(
     id_sports_program,
