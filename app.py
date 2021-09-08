@@ -58,6 +58,9 @@ def login():
         if len(mdp) == 0:
             return json.dumps({"message": "Username incorrect"})
         elif check_password_hash(mdp[0]['password'], pswd):
+            print (len(get_well_being(username)))
+            if (len(get_well_being(username)) == 0) :
+                create_well_being(get_id_user(username), get_size_user(get_id_user(username)))
             return json.dumps({"message": "Connexion réussie", "user" : username}) #return token
         else:
             return json.dumps({"message": "Mot de passe incorrect"})
@@ -634,6 +637,37 @@ def get_well_being_stats(username: str):
                         WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;
             """, False
     )
+
+def get_size_user(id: str):
+    return make_query(
+        f""" SELECT max(size) as size
+        FROM well_being
+        WHERE id_user = {id[0]["id_user"]}""",0
+    )
+
+def get_well_being_withdate(username: str):
+    return make_query(
+            f"""SELECT wb.calories, wb.water, wb.sleep, wb.date
+            fROM user u 
+            INNER JOIN WELL_BEING wb 
+            ON u.id_user = wb.id_user
+            WHERE u.username = '{username}' 
+            AND wb.date = date(\'now\',\'+1 hours\')
+            ORDER BY wb.date DESC LIMIT 10;""", 0
+        )
+
+def create_well_being(id: str, size: str):
+    print(len({size[0]["size"]}))
+    if (len({size[0]["size"]}) == 1):
+        return make_query(
+            f""" INSERT INTO well_being(date, id_user)
+            VALUES (date(\'now\',\'+1 hours\'), {id[0]["id_user"]} )""",1
+        )
+    else :
+        return make_query(
+            f""" INSERT INTO well_being(date, id_user, size)
+            VALUES (date(\'now\',\'+1 hours\'), {id[0]["id_user"]},  {size[0]["size"]})""",1
+        )
 
 def make_query(query: str, needCommit: bool):
     """ Execute la requête passé en paramètre """
