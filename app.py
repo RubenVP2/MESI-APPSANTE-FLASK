@@ -94,16 +94,14 @@ def addWaterHistorique():
         date = content['date']
         username = content['username']
         id_user = get_id_user(username)[0]["id_user"]
-        userWaterTest = make_query(
-        f"""
-        SELECT id_well_being,date,water, weight
-        FROM WELL_BEING
-        WHERE id_user = {id_user} and date = '{date}' """,
-        0,
-        )
-        if not userWaterTest:
-            make_query(f'INSERT INTO WELL_BEING (id_user,water,date) VALUES("{id_user}","{water}","{date}")', True)
+
+        """SI LA LIGNE EXISTE MAIS WATER A NULL"""
+        if (len(get_user_water_waterIsEmpty(id_user,date)) > 0 and len(get_user_water_waterIsNotEmpty(id_user,date))==0) :
+            make_query(f'UPDATE WELL_BEING SET water = "{water}" WHERE id_user="{id_user}" and date="{date}"', True)
             return json.dumps({"message": "Insertion réussie"})
+        elif (len(get_user_water_waterIsEmpty(id_user,date)) == 0 and len(get_user_water_waterIsNotEmpty(id_user,date))==0):
+            make_query(f'INSERT INTO WELL_BEING (id_user,water,date) VALUES("{id_user}","{water}","{date}")', True)
+            return json.dumps({"message": "Insertion réussie pour ce jour réussie ! N'oubliez pas d'ajouter vos mensurations pour ce jour"})
         else:
             return json.dumps({"message": "Insertion déjà existante, veuillez la modifier dans le menu"})
 
@@ -232,6 +230,24 @@ def get_user(idUser: int):
         WHERE id_user = {idUser}""",
         0,
     )
+
+def get_user_water_waterIsNotEmpty(id_user: str, date: datetime):
+    """ Return information of the user """
+    return make_query(
+        f"""
+                    SELECT id_well_being 
+                    FROM WELL_BEING
+                    WHERE id_user = {id_user} and date = '{date}' and water is not null""",
+        0)
+
+def get_user_water_waterIsEmpty(id_user: str, date: datetime):
+    """ Return information of the user """
+    return make_query(
+        f"""
+                    SELECT id_well_being 
+                    FROM WELL_BEING
+                    WHERE id_user = {id_user} and date = '{date}' and water is null""",
+        0)
 
 
 def make_query(query: str, needCommit: bool):
