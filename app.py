@@ -16,7 +16,6 @@ Enable CORS. Disable it if you don't need CORS
 https://parzibyte.me/blog
 """
 
-
 @app.after_request
 def after_request(response):
     response.headers[
@@ -99,6 +98,7 @@ def update_profil(username: str):
         update_username(new_username, username)
         return json.dumps({"message": "Pseudonyme mis à jour."})
     else:
+        password = generate_password_hash(password)
         update_username_and_password(new_username, username, password)
         return json.dumps({"message": "Le pseudonyme et le mot de passe ont été mis à jour."})
 
