@@ -16,7 +16,6 @@ Enable CORS. Disable it if you don't need CORS
 https://parzibyte.me/blog
 """
 
-
 @app.after_request
 def after_request(response):
     response.headers[
@@ -89,6 +88,22 @@ def inscription():
         else :
             register(username, pswd1, email, age, sexe)
             return json.dumps({"message": "Inscription réussie"})
+
+
+@app.route("/user/<string:username>", methods={"POST"})
+def update_profil(username: str):
+    content = request.get_json()['user']
+    new_username = content['username']
+    password = content['password']
+    print(content)
+    print(username)
+    if not password:
+        update_username(new_username, username)
+        return json.dumps({"message": "Pseudonyme mis à jour."})
+    else:
+        password = generate_password_hash(password)
+        update_username_and_password(new_username, username, password)
+        return json.dumps({"message": "Le pseudonyme et le mot de passe ont été mis à jour."})
 
 # Récupére toutes les feedbacks
 @app.route("/feedbacks", methods={"POST", "GET"})
@@ -668,6 +683,12 @@ def create_well_being(id: str, size: str):
             f""" INSERT INTO well_being(date, id_user, size)
             VALUES (date(\'now\',\'+1 hours\'), {id[0]["id_user"]},  {size[0]["size"]})""",1
         )
+
+def update_username(username: str, old_username: str):
+    make_query(f"""UPDATE USER SET username = '{username}' WHERE username = '{old_username}';""", needCommit=True)
+
+def update_username_and_password(username: str, old_username: str, password: str):
+    make_query(f"""UPDATE USER SET username = '{username}', password = '{password}' WHERE username = '{old_username}';""", needCommit=True)
 
 def make_query(query: str, needCommit: bool):
     """ Execute la requête passé en paramètre """

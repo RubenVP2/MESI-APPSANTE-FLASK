@@ -11,7 +11,7 @@ INSERT INTO USER (
     )
 VALUES (
         'ruben',
-        'lesuperbemotdepassederuben',
+        'pbkdf2:sha256:260000$jgjgONuN2NLxQPiT$7acc62efbb4f46f87cec0c9a5fe7628240dedaab9915eb3649b3e353eff27f4b',
         0,
         'ruben@gmail.com',
         'Homme',
@@ -21,7 +21,7 @@ VALUES (
     ),
     (
         'antoine',
-        'monmotdepassimpossibleatrouver',
+        'pbkdf2:sha256:260000$e4DTeiT29t3qC334$72a139ac5e1f959eb3900ab196a70d60d8a390f28557887814c22bb68edcd5aa',
         1,
         'antoinebouardain@gmail.com',
         'Homme',
