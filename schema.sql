@@ -50,7 +50,7 @@ CREATE TABLE "USED" (
     "id_exercice" INT,
     "weight" REAL,
     "date" DATETIME,
-    PRIMARY KEY ("id_user", "id_exercice"),
+    PRIMARY KEY ("id_user", "id_exercice", "date"),
     FOREIGN KEY ("id_user") REFERENCES "USER" ("id_user"),
     FOREIGN KEY ("id_exercice") REFERENCES "EXERCICE" ("id_exercice")
 );
@@ -85,6 +85,7 @@ CREATE TABLE "USER" (
     "id_user" INTEGER PRIMARY KEY AUTOINCREMENT,
     "username" VARCHAR(50),
     "password" VARCHAR,
+    "isAdmin" BOOLEAN,
     "mail" VARCHAR(250),
     "sexe" VARCHAR(50),
     "age" INT,
@@ -95,9 +96,11 @@ CREATE TABLE "USER" (
 );
 CREATE TABLE "FEEDBACK" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "nature" VARCHAR,
     "title" VARCHAR(50),
     "description" VARCHAR,
     "date" DATETIME,
+    "etat" VARCHAR,
     "id_user" BIGINT,
     FOREIGN KEY ("id_user") REFERENCES "USER" ("id_user")
 );
@@ -133,50 +136,3 @@ Unite VARCHAR(100),
 energie VARCHAR(100),
 calories DOUBLE
 );
--- Insertion
-INSERT INTO USER (
-        username,
-        password,
-        mail,
-        sexe,
-        age,
-        reminderweight,
-        remindermeasurements
-    )
-VALUES (
-        'ruben',
-        'lesuperbemotdepassederuben',
-        'ruben@gmail.com',
-        'Homme',
-        20,
-        5,
-        60
-    ),
-    (
-        'antoine',
-        'monmotdepassimpossibleatrouver',
-        'antoinebouardain@gmail.com',
-        'Homme',
-        20,
-        2,
-        30
-    );
-INSERT INTO EXERCICE (
-        title,
-        imagehelp,
-        nbreps,
-        nbseries,
-        restseries,
-        restexercice
-    )
-VALUES ('Pompes', '', 15, 4, 45, 120),
-    ('Tractions', '', 12, 4, 45, 120);
-
-INSERT INTO WELL_BEING (calories, water, sleep, size, weight, imc, date, id_user)
-VALUES
-    (127.23, 2.9, 8.20, 176.2, 67.9, 20.4, '2009-01-01', 3),
-    (127.23, 2.1, 8.20, 176.2, 67.9, 20.4, '2007-01-01', 2),
-    (111.23, 1.2, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 3),
-    (111.23, 1.9, 1.20, 111.2, 10.9, 20.4, '2011-05-01', 3),
-    (111.23, 1.9, 1.20, 111.2, 31.9, 20.4, '2011-05-01', 3),
-    (111.23, 7.9, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 3);

@@ -63,6 +63,57 @@ def login():
         else:
             return json.dumps({"message": "Mot de passe incorrect"})
 
+@app.route("/user/weight/today/<string:username>", methods={"POST"})
+def weight_Of_The_Day_Empty(username:str):
+    if request.method == "POST":
+        content = request.get_json()
+        date = content
+        print(date)
+        id_user = get_id_user(username)[0]["id_user"]
+        weight = get_weight(id_user,date)
+        print(weight)
+        if (len(weight) > 0) :
+            bool = True
+            return json.dumps({"exist": bool})
+        elif (len(weight) == 0) :
+            print("je suis faux")
+            bool = False
+            return json.dumps({"exist": bool})
+
+@app.route("/user/water/today/<string:username>", methods={"POST"})
+def water_Of_The_Day_Empty(username:str):
+    if request.method == "POST":
+        content = request.get_json()
+        date = content
+        id_user = get_id_user(username)[0]["id_user"]
+        water = get_water(id_user,date)
+        print(water)
+        if (len(water) > 0) :
+            bool = True
+            print("je suis vraie")
+            return json.dumps({"exist": bool})
+        elif (len(water) == 0) :
+            print("je suis faux mais je dois etre vrai")
+            bool = False
+            return json.dumps({"exist": bool})
+
+@app.route("/user/sleep/today/<string:username>", methods={"POST"})
+def sleep_Of_The_Day_Empty(username:str):
+    if request.method == "POST":
+        content = request.get_json()
+        date = content
+        id_user = get_id_user(username)[0]["id_user"]
+        sleep = get_sleep(id_user,date)
+        if (len(sleep) > 0) :
+            bool = True
+            return json.dumps({"exist": bool})
+        elif (len(sleep) == 0) :
+            print("je suis faux")
+            bool = False
+            return json.dumps({"exist": bool})
+
+
+
 #Insert a new user
 @app.route("/register", methods={"POST"})
 def inscription():
@@ -153,16 +204,9 @@ def suggestionbugtrackerAdd():
         add_feedback(nature, title, description, id_user)
         return json.dumps({"message": "Feedback envoyé"})
 
-# Récupération de tout les exercices
-@app.route("/exercices")
-def exercices():
-    exercices = get_all_exercices()
-    return json.dumps({"exercices": exercices})
-
-
 # Récupération d'un exercice par id
 @app.route("/exercicesdetails", methods={"POST"})
-def exercices_by_id():
+def exercices_by_id_details():
     content = request.get_json()
     id = content['id_exercice']
     exercice = get_exercice(id)
@@ -585,6 +629,28 @@ def get_exercice(id: int):
         LEFT JOIN muscle 
         ON made_work.id_muscle = muscle.id_muscle
         WHERE exercice.id_exercice = {id};""", 0
+    )
+
+def get_water(id_user: int, date: datetime):
+    """ return one exercice with muscle that made work """
+    return make_query(
+        f"""SELECT id_well_being 
+                    FROM WELL_BEING
+                    WHERE id_user = {id_user} and date = '{date}' and water is not null;""", 0
+    )
+def get_weight(id_user: int, date: datetime):
+    """ return one exercice with muscle that made work """
+    return make_query(
+        f"""SELECT id_well_being 
+                    FROM WELL_BEING
+                    WHERE id_user = {id_user} and date = '{date}' and weight is not null;""", 0
+    )
+def get_sleep(id_user: int, date: datetime):
+    """ return one exercice with muscle that made work """
+    return make_query(
+        f"""SELECT id_well_being 
+                    FROM WELL_BEING
+                    WHERE id_user = {id_user} and date = '{date}' and sleep is not null;""", 0
     )
 
 def delete_exercice(id_exercice: int, id_user: int):
