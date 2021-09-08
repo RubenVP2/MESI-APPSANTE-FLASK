@@ -87,6 +87,21 @@ def inscription():
             register(username, pswd1, email, age, sexe)
             return json.dumps({"message": "Inscription réussie"})
 
+
+@app.route("/user/<string:username>", methods={"POST"})
+def update_profil(username: str):
+    content = request.get_json()['user']
+    new_username = content['username']
+    password = content['password']
+    print(content)
+    print(username)
+    if not password:
+        update_username(new_username, username)
+        return json.dumps({"message": "Pseudonyme mis à jour."})
+    else:
+        update_username_and_password(new_username, username, password)
+        return json.dumps({"message": "Le pseudonyme et le mot de passe ont été mis à jour."})
+
 # Récupére toutes les feedbacks
 @app.route("/feedbacks", methods={"POST", "GET"})
 def allsuggestionbugtracker():
@@ -634,6 +649,12 @@ def get_well_being_stats(username: str):
                         WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;
             """, False
     )
+
+def update_username(username: str, old_username: str):
+    make_query(f"""UPDATE USER SET username = '{username}' WHERE username = '{old_username}';""", needCommit=True)
+
+def update_username_and_password(username: str, old_username: str, password: str):
+    make_query(f"""UPDATE USER SET username = '{username}', password = '{password}' WHERE username = '{old_username}';""", needCommit=True)
 
 def make_query(query: str, needCommit: bool):
     """ Execute la requête passé en paramètre """
