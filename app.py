@@ -17,7 +17,6 @@ Enable CORS. Disable it if you don't need CORS
 https://parzibyte.me/blog
 """
 
-
 @app.after_request
 def after_request(response):
     response.headers[
@@ -59,6 +58,9 @@ def login():
         if len(mdp) == 0:
             return json.dumps({"message": "Username incorrect"})
         elif check_password_hash(mdp[0]['password'], pswd):
+            print (len(get_well_being(username)))
+            if (len(get_well_being(username)) == 0) :
+                create_well_being(get_id_user(username), get_size_user(get_id_user(username)))
             return json.dumps({"message": "Connexion réussie", "user" : username}) #return token
         else:
             return json.dumps({"message": "Mot de passe incorrect"})
@@ -87,6 +89,22 @@ def inscription():
         else :
             register(username, pswd1, email, age, sexe)
             return json.dumps({"message": "Inscription réussie"})
+
+
+@app.route("/user/<string:username>", methods={"POST"})
+def update_profil(username: str):
+    content = request.get_json()['user']
+    new_username = content['username']
+    password = content['password']
+    print(content)
+    print(username)
+    if not password:
+        update_username(new_username, username)
+        return json.dumps({"message": "Pseudonyme mis à jour."})
+    else:
+        password = generate_password_hash(password)
+        update_username_and_password(new_username, username, password)
+        return json.dumps({"message": "Le pseudonyme et le mot de passe ont été mis à jour."})
 
 # Récupére toutes les feedbacks
 @app.route("/feedbacks", methods={"POST", "GET"})
@@ -737,6 +755,43 @@ def get_user_water_waterIsEmpty(id_user: str, date: datetime):
                     WHERE id_user = {id_user} and date = '{date}' and water is null""",
         0)
 
+
+def get_size_user(id: str):
+    return make_query(
+        f""" SELECT max(size) as size
+        FROM well_being
+        WHERE id_user = {id[0]["id_user"]}""",0
+    )
+
+def get_well_being_withdate(username: str):
+    return make_query(
+            f"""SELECT wb.calories, wb.water, wb.sleep, wb.date
+            fROM user u 
+            INNER JOIN WELL_BEING wb 
+            ON u.id_user = wb.id_user
+            WHERE u.username = '{username}' 
+            AND wb.date = date(\'now\',\'+1 hours\')
+            ORDER BY wb.date DESC LIMIT 10;""", 0
+        )
+
+def create_well_being(id: str, size: str):
+    print(len({size[0]["size"]}))
+    if (len({size[0]["size"]}) == 1):
+        return make_query(
+            f""" INSERT INTO well_being(date, id_user)
+            VALUES (date(\'now\',\'+1 hours\'), {id[0]["id_user"]} )""",1
+        )
+    else :
+        return make_query(
+            f""" INSERT INTO well_being(date, id_user, size)
+            VALUES (date(\'now\',\'+1 hours\'), {id[0]["id_user"]},  {size[0]["size"]})""",1
+        )
+
+def update_username(username: str, old_username: str):
+    make_query(f"""UPDATE USER SET username = '{username}' WHERE username = '{old_username}';""", needCommit=True)
+
+def update_username_and_password(username: str, old_username: str, password: str):
+    make_query(f"""UPDATE USER SET username = '{username}', password = '{password}' WHERE username = '{old_username}';""", needCommit=True)
 
 def make_query(query: str, needCommit: bool):
     """ Execute la requête passé en paramètre """
