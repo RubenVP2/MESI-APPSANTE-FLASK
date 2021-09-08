@@ -3,6 +3,7 @@ import click
 
 from flask import Flask, g, json, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 # from flask_cors import CORS
 from flask.cli import with_appcontext
@@ -296,7 +297,37 @@ def sportsprogramupdate():
     update_sportsprogram(id_sports_program, title,description, level)
     return json.dumps({"message" : "Modification réussie"})
 
-# Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
+# Insert a new value of water
+@app.route("/addWater", methods={"POST"})
+def addWaterHistorique():
+    if request.method == "POST":
+        content = request.get_json()
+        water = content['water']
+        date = content['date']
+        username = content['username']
+        id_user = get_id_user(username)[0]["id_user"]
+
+        """SI LA LIGNE EXISTE MAIS WATER A NULL"""
+        if (len(get_user_water_waterIsEmpty(id_user,date)) > 0 and len(get_user_water_waterIsNotEmpty(id_user,date))==0) :
+            make_query(f'UPDATE WELL_BEING SET water = "{water}" WHERE id_user="{id_user}" and date="{date}"', True)
+            return json.dumps({"message": "Insertion réussie"})
+        elif (len(get_user_water_waterIsEmpty(id_user,date)) == 0 and len(get_user_water_waterIsNotEmpty(id_user,date))==0):
+            make_query(f'INSERT INTO WELL_BEING (id_user,water,date) VALUES("{id_user}","{water}","{date}")', True)
+            return json.dumps({"message": "Insertion réussie pour ce jour réussie ! N'oubliez pas d'ajouter vos mensurations pour ce jour"})
+        else:
+            return json.dumps({"message": "Insertion déjà existante, veuillez la modifier dans le menu"})
+
+
+# Update a new value of water
+@app.route("/updateWater/<int:idWaterOfWellBeing>", methods={"POST"})
+def updateWaterHistorique(idWaterOfWellBeing: int):
+    if request.method == "POST":
+        content = request.get_json()
+        water = content['water']
+        make_query(f'UPDATE WELL_BEING set water="{water}" WHERE id_well_being="{idWaterOfWellBeing}" ', True)
+        return json.dumps({"message": "Update réussie"})
+
+    # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
 
 
 @app.route("/test/user/all")
@@ -330,6 +361,34 @@ def exercices_by_id_or_names():
             exercice = make_query(
                 f"SELECT * FROM exercice WHERE LOWER(title) = '{title}' ;", 0
             )
+@app.route("/user/water/<string:username>")
+def userWaters(username: str):
+    """Return in JSON Informations about user water"""
+    userWater = get_watersOfUser(username)
+    return json.dumps({"userWater": userWater})
+
+
+@app.route("/user/water/<string:username>/filter", methods=["POST"])
+def userWatersFilter(username: str):
+    if request.method == "POST":
+        content = request.get_json()
+        dateStart = content['dateStart']
+        dateEnd = content['dateEnd']
+        userWater = get_watersOfUserFilter(username, dateStart, dateEnd)
+        return json.dumps({"message": "Filtrage réussie", "userWater": userWater})
+
+
+# Récupération de tout les exercices
+@app.route("/exercices")
+def exercices():
+    exercices = make_query("SELECT * FROM exercice;", 0)
+    return json.dumps({"exercices": exercices})
+
+
+# Récupération d'un exercice par id
+@app.route("/exercices/<int:id>")
+def exercices_by_id(id: int):
+    exercice = make_query(f"SELECT * FROM exercice WHERE id_exercice = {id};", 0)
     return json.dumps({"exercice": exercice})
 
 
@@ -357,7 +416,6 @@ def get_all_users():
         FROM USER""",
         0,
     )
-
 def get_role_user(username: str):
     """ Return role of the user """
     return make_query(
@@ -418,6 +476,41 @@ def update_feedback(idFeedback: int, state: str):
         1,
     )
 
+def get_id_user(username: str):
+    """ Return information of the user """
+    return make_query(
+        f"""
+        SELECT id_user
+        FROM USER
+        WHERE username = '{username}'""",
+        0,
+    )
+
+
+def get_watersOfUser(username: str):
+    """return les enregistrements en eau d'un user"""
+    userId = get_id_user(username)[0]["id_user"]
+    return make_query(
+        f"""
+        SELECT id_well_being,date,water, weight
+        FROM WELL_BEING
+        WHERE id_user = {userId} order by date desc""",
+        0,
+    )
+
+
+def get_watersOfUserFilter(username: str, dateStart: datetime, dateEnd: datetime):
+    """return les enregistrements en eau d'un user"""
+    userId = get_id_user(username)[0]["id_user"]
+    return make_query(
+        f"""
+        SELECT id_well_being,date,water, weight
+        FROM WELL_BEING
+        WHERE id_user = {userId} and date between '{dateStart}' and '{dateEnd}' order by date desc""",
+        0,
+    )
+
+
 def get_user(idUser: int):
     """ Return information of the user """
     return make_query(
@@ -428,15 +521,7 @@ def get_user(idUser: int):
         0,
     )
 
-def get_id_user(username: str):
-    """ Return information of the user """
-    return make_query(
-        f"""
-        SELECT id_user
-        FROM USER
-        WHERE username = '{username}'""",
-        0,
-    )
+
 
 def login(username: str):
     """ Return password of the username """
@@ -634,6 +719,24 @@ def get_well_being_stats(username: str):
                         WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;
             """, False
     )
+def get_user_water_waterIsNotEmpty(id_user: str, date: datetime):
+    """ Return information of the user """
+    return make_query(
+        f"""
+                    SELECT id_well_being 
+                    FROM WELL_BEING
+                    WHERE id_user = {id_user} and date = '{date}' and water is not null""",
+        0)
+
+def get_user_water_waterIsEmpty(id_user: str, date: datetime):
+    """ Return information of the user """
+    return make_query(
+        f"""
+                    SELECT id_well_being 
+                    FROM WELL_BEING
+                    WHERE id_user = {id_user} and date = '{date}' and water is null""",
+        0)
+
 
 def make_query(query: str, needCommit: bool):
     """ Execute la requête passé en paramètre """
