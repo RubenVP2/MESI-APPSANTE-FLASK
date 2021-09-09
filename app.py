@@ -454,20 +454,32 @@ def updateWeightHistorique(idWeightOfWellBeing: int):
         make_query(f'UPDATE WELL_BEING set weight="{weight}" WHERE id_well_being="{idWeightOfWellBeing}" ', True)
         return json.dumps({"message": "Update réussie"})
 
+@app.route("/user/weight/pageable/<string:username>")
+def userWeightsPageable(username: str):
+    limit, offset = request.args.get('limit', type=int), request.args.get('offset', type=int)
+    """Return in JSON Informations about user water"""
+    userWeight = get_weightsOfUserPageable(username,limit, offset)
+    number_elements = count_all_weightOfUser(username)[0]['total']
+    return json.dumps({"userWeight": userWeight, "total": number_elements})
+
 @app.route("/user/weight/<string:username>")
 def userWeights(username: str):
+    print("JE SUIS LA")
     """Return in JSON Informations about user water"""
     userWeight = get_weightsOfUser(username)
     return json.dumps({"userWeight": userWeight})
 
+
 @app.route("/user/weight/<string:username>/filter", methods=["POST"])
 def userWeightsFilter(username: str):
     if request.method == "POST":
+        limit, offset = request.args.get('limit', type=int), request.args.get('offset', type=int)
+        number_elements = count_all_weightOfUser(username)[0]['total']
         content = request.get_json()
         dateStart = content['dateStart']
         dateEnd = content['dateEnd']
-        userWeight = get_weightsOfUserFilter(username, dateStart, dateEnd)
-        return json.dumps({"message": "Filtrage réussie", "userWeight": userWeight})
+        userWeight = get_weightsOfUserFilter(username, dateStart, dateEnd,limit, offset)
+        return json.dumps({"message": "Filtrage réussie", "userWeight": userWeight,"total": number_elements})
 
     # Cette route ne sert qu'a montrer comment faire. Eviter de l'utiliser surtout quand y'aura beaucoup d'utilisateur !!!
 
@@ -505,13 +517,13 @@ def exercices_by_id_or_names():
             )
 
 @app.route("/user/water/pageable/<string:username>")
-def userWatersPaeable(username: str):
+def userWatersPageable(username: str):
     """Return in JSON Informations about user water"""
     print("JE DOIS M'AFFICHER")
     limit, offset = request.args.get('limit', type=int), request.args.get('offset', type=int)
     number_elements = count_all_waterOfUser(username)[0]['total']
     userWater = get_watersOfUserPageable(username,limit, offset)
-    return json.dumps({"userWater": userWater, 'total': number_elements})
+    return json.dumps({"userWater": userWater, 'total': number_elements,"total": number_elements})
 
 @app.route("/user/water/<string:username>")
 def userWaters(username: str):
@@ -689,7 +701,7 @@ def get_watersOfUser(username: str):
     userId = get_id_user(username)[0]["id_user"]
     return make_query(
         f"""
-        SELECT id_well_being,date,water, weight
+        SELECT id_well_being,date,water, weight,calories
         FROM WELL_BEING
         WHERE id_user = {userId} order by date desc""",
         0,
@@ -701,28 +713,27 @@ def get_watersOfUserFilter(username: str, dateStart: datetime, dateEnd: datetime
     userId = get_id_user(username)[0]["id_user"]
     return make_query(
         f"""
-        SELECT id_well_being,date,water, weight
+        SELECT id_well_being,date,water, weight,calories
         FROM WELL_BEING
         WHERE id_user = {userId} and date between '{dateStart}' and '{dateEnd}' order by date desc""",
         0,
     )
 
 
-def get_watersOfUserFilter(username: str, dateStart: datetime, dateEnd: datetime):
+def get_weightsOfUserPageable(username: str,limit, offset):
     """return les enregistrements en eau d'un user"""
     userId = get_id_user(username)[0]["id_user"]
     return make_query(
         f"""
-        SELECT id_well_being,date,water, weight, calories
+        SELECT id_well_being,date,water, weight
         FROM WELL_BEING
-        WHERE id_user = {userId} and date between '{dateStart}' and '{dateEnd}' order by date desc""",
-        0,
-    )
-
+        WHERE id_user = {userId} order by date desc  LIMIT {limit} OFFSET {offset}""",
+        0,)
 
 def get_weightsOfUser(username: str):
     """return les enregistrements en eau d'un user"""
     userId = get_id_user(username)[0]["id_user"]
+    print(userId)
     return make_query(
         f"""
         SELECT id_well_being,date,water, weight
@@ -730,15 +741,14 @@ def get_weightsOfUser(username: str):
         WHERE id_user = {userId} order by date desc""",
         0,)
 
-
-def get_weightsOfUserFilter(username: str, dateStart: datetime, dateEnd: datetime):
+def get_weightsOfUserFilter(username: str, dateStart: datetime, dateEnd: datetime,limit, offset):
     """return les enregistrements en eau d'un user"""
     userId = get_id_user(username)[0]["id_user"]
     return make_query(
         f"""
         SELECT id_well_being,date,water, weight
         FROM WELL_BEING
-        WHERE id_user = {userId} and date between '{dateStart}' and '{dateEnd}' order by date desc""",
+        WHERE id_user = {userId} and date between '{dateStart}' and '{dateEnd}' order by date desc  LIMIT {limit} OFFSET {offset}""",
         0,
     )
 
@@ -1094,6 +1104,10 @@ def count_all_aliments():
     return make_query(f"SELECT count(Id) as 'total' FROM aliment;", needCommit=False)
 
 def count_all_waterOfUser(username:str):
+    userId = get_id_user(username)[0]["id_user"]
+    return make_query(f"SELECT count(id_well_being) as 'total' FROM WELL_BEING where id_user = {userId};", needCommit=False)
+
+def count_all_weightOfUser(username:str):
     userId = get_id_user(username)[0]["id_user"]
     return make_query(f"SELECT count(id_well_being) as 'total' FROM WELL_BEING where id_user = {userId};", needCommit=False)
 
