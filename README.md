@@ -4,10 +4,8 @@ Api de l'application APPSANTE pour le projet MESI.
 [![Publish Docker image](https://github.com/RubenVP2/MESI-APPSANTE-FLASK/actions/workflows/docker-ci.yaml/badge.svg)](https://github.com/RubenVP2/MESI-APPSANTE-FLASK/actions/workflows/docker-ci.yaml)
 [![CI](https://github.com/RubenVP2/MESI-APPSANTE-FLASK/actions/workflows/main.yml/badge.svg)](https://github.com/RubenVP2/MESI-APPSANTE-FLASK/actions/workflows/main.yml)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=bugs)](https://sonarcloud.io/dashboard?id=Mesi-flask)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=code_smells)](https://sonarcloud.io/dashboard?id=Mesi-flask)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=ncloc)](https://sonarcloud.io/dashboard?id=Mesi-flask)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=Mesi-flask)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Mesi-flask&metric=security_rating)](https://sonarcloud.io/dashboard?id=Mesi-flask)
 
 ## Installation
 
