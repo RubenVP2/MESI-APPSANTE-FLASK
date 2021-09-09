@@ -12,7 +12,7 @@ INSERT INTO USER (
 VALUES (
         'ruben',
         'pbkdf2:sha256:260000$jgjgONuN2NLxQPiT$7acc62efbb4f46f87cec0c9a5fe7628240dedaab9915eb3649b3e353eff27f4b',
-        0,
+        1,
         'ruben@gmail.com',
         'Homme',
         20,
@@ -67,6 +67,7 @@ INSERT INTO SPORTS_PROGRAM(
     creator
 )
 VALUES ("Séance Facile", "Séance pour les débutants", "Facile", "ruben"),
+       ("Séance Intermédiraire", "Séance pour les intermédiaire", "Intermédiaire", "ruben"),
        ("Séance Dificile", "Séance pour les experts", "Difficile", "antoine");
 
 INSERT INTO HAVE(
@@ -108,18 +109,20 @@ VALUES ('Bug', 'Bug Suivi Eau','description bug suivi eau', '2021-03-04 14:59:07
 
 INSERT INTO WELL_BEING (calories, water, sleep, size, weight, imc, date, id_user)
 VALUES
-    (127.23, 2.9, 8.20, 176.2, 67.9, 20.4, '2009-01-01', 3),
+    (127.23, 2.9, 8.20, 176.2, 67.9, 20.4, '2009-01-01', 2),
     (127.23, 2.1, 8.20, 176.2, 67.9, 20.4, '2007-01-01', 2),
-    (111.23, 1.2, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 3),
-    (111.23, 1.9, 1.20, 111.2, 10.9, 20.4, '2011-05-01', 3),
-    (111.23, 1.9, 1.20, 111.2, 31.9, 20.4, '2011-05-01', 3),
-    (111.23, 7.9, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 3),
-    (127.23, 2.9, 8.20, 176.2, 67.9, 20.4, '2021-09-01', 1),
-    (127.23, 2.1, 8.20, 176.2, 67.9, 20.4, '2021-09-02', 1),
-    (111.23, 1.2, 1.20, 111.2, 111.9, 20.4, '2021-09-03', 1),
-    (111.23, 1.9, 1.20, 111.2, 10.9, 20.4, '2021-09-04', 1),
-    (111.23, 1.9, 1.20, 111.2, 31.9, 20.4, '2021-09-05', 1),
-    (111.23, 7.9, 1.20, 111.2, 111.9, 20.4, '2021-09-06', 1);
+    (111.23, 1.2, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 2),
+    (111.23, 1.9, 1.20, 111.2, 10.9, 20.4, '2011-05-01', 2),
+    (111.23, 1.9, 1.20, 111.2, 31.9, 20.4, '2011-05-01', 2),
+    (111.23, 7.9, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 2),
+    (100,2,8,180,80,25,'2021-03-04 14:59:07',2),
+
+    (1500, 2.5, 8, 179, 65, 15, '2021-09-04', 1),
+    (1850, 1.75, 10, 179, 67.9, 16.8, '2021-09-05', 1),
+    (1950, 2, 9, 179, 72.8, 18.9, '2021-09-06', 1),
+    (2100, 1.5, 8, 179, 75.9, 19.8, '2021-09-07', 1),
+    (1750, 2, 6, 179, 78.6, 21.1, '2021-09-08', 1),
+    (2200, 1.5, 8, 179, 80.5, 23.5, '2021-09-09', 1);
 
 /* INSERT QUERY NO: 1 */
 INSERT INTO ALIMENT(Id, Nom, Categorie, Densit, Unite, energie, calories)
@@ -10227,9 +10230,4 @@ INSERT INTO ALIMENT(Id, Nom, Categorie, Densit, Unite, energie, calories)
 VALUES
 (
 2581, 'Swiss Vitamin Institute', ' determination of vitamin in nuts and dried fruits for swiss food composition database (analysis results)', ' Epalinges', ' Switzerland', ' 2020', 0
-);
-
-INSERT INTO WELL_BEING(calories,water,sleep,size,weight,imc,date,id_user)
-VALUES(
-100,2,8,180,80,25,'2021-03-04 14:59:07',3
 );
