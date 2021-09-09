@@ -405,11 +405,14 @@ def addWaterHistorique():
         """SI LA LIGNE EXISTE MAIS WATER A NULL"""
         if (len(get_user_water_waterIsEmpty(id_user,date)) > 0 and len(get_user_water_waterIsNotEmpty(id_user,date))==0) :
             make_query(f'UPDATE WELL_BEING SET water = "{water}" WHERE id_user="{id_user}" and date="{date}"', True)
+            print("premier if")
             return json.dumps({"message": "Insertion réussie"})
         elif (len(get_user_water_waterIsEmpty(id_user,date)) == 0 and len(get_user_water_waterIsNotEmpty(id_user,date))==0):
             make_query(f'INSERT INTO WELL_BEING (id_user,water,date) VALUES("{id_user}","{water}","{date}")', True)
+            print("deuxieme if")
             return json.dumps({"message": "Insertion réussie pour ce jour ! N'oubliez pas d'ajouter vos mensurations pour ce jour"})
         else:
+            print("troisième if")
             return json.dumps({"message": "Insertion déjà existante, veuillez la modifier dans le menu"})
 
 @app.route("/addWeight", methods={"POST"})
@@ -429,7 +432,7 @@ def addWeightHistorique():
             make_query(f'INSERT INTO WELL_BEING (id_user,weight,date) VALUES("{id_user}","{weight}","{date}")', True)
             return json.dumps({"message": "Insertion réussie pour ce jour"})
         else:
-            return json.dumps({"message": "Insertion déjà existante, veuillez la modifier dans le menu"})
+            return json.dumps({"message": "Insertion déjà existante pour cette date, veuillez la modifier dans le menu"})
 
 
 # Update a new value of water
@@ -500,6 +503,15 @@ def exercices_by_id_or_names():
                 f"SELECT * FROM exercice WHERE LOWER(title) = '{title}' ;", 0
             )
 
+@app.route("/user/water/pageable/<string:username>")
+def userWatersPaeable(username: str):
+    """Return in JSON Informations about user water"""
+    print("JE DOIS M'AFFICHER")
+    limit, offset = request.args.get('limit', type=int), request.args.get('offset', type=int)
+    number_elements = count_all_waterOfUser(username)[0]['total']
+    userWater = get_watersOfUserPageable(username,limit, offset)
+    return json.dumps({"userWater": userWater, 'total': number_elements})
+
 @app.route("/user/water/<string:username>")
 def userWaters(username: str):
     """Return in JSON Informations about user water"""
@@ -534,6 +546,7 @@ def get_well_being(username: str):
 
 @app.route("/wellBeing/<string:username>/stats", methods=["GET"])
 def get_well_being_stats(username: str):
+    print(username)
     data = get_well_being(username)
     data_avg = get_well_being_stats(username)
     return json.dumps({'well_being_stats': data, 'well_being_avg': data_avg})
@@ -633,6 +646,17 @@ def get_id_user(username: str):
         0,
     )
 
+
+def get_watersOfUserPageable(username: str,limit, offset):
+    """return les enregistrements en eau d'un user"""
+    userId = get_id_user(username)[0]["id_user"]
+    return make_query(
+        f"""
+        SELECT id_well_being,date,water, weight
+        FROM WELL_BEING
+        WHERE id_user = {userId} order by date desc LIMIT {limit} OFFSET {offset}""",
+        0,
+    )
 
 def get_watersOfUser(username: str):
     """return les enregistrements en eau d'un user"""
@@ -1029,6 +1053,10 @@ def get_all_aliments_from_bdd(limit, offset):
 
 def count_all_aliments():
     return make_query(f"SELECT count(Id) as 'total' FROM aliment;", needCommit=False)
+
+def count_all_waterOfUser(username:str):
+    userId = get_id_user(username)[0]["id_user"]
+    return make_query(f"SELECT count(id_well_being) as 'total' FROM WELL_BEING where id_user = {userId};", needCommit=False)
 
 
 def make_query(query: str, needCommit: bool):
