@@ -10228,3 +10228,8 @@ VALUES
 (
 2581, 'Swiss Vitamin Institute', ' determination of vitamin in nuts and dried fruits for swiss food composition database (analysis results)', ' Epalinges', ' Switzerland', ' 2020', 0
 );
+
+INSERT INTO WELL_BEING(calories,water,sleep,size,weight,imc,date,id_user)
+VALUES(
+100,2,8,180,80,25,'2021-03-04 14:59:07',3
+);
