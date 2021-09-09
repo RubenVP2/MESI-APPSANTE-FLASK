@@ -61,7 +61,6 @@ def login():
         if len(mdp) == 0:
             return json.dumps({"message": "Username incorrect"})
         elif check_password_hash(mdp[0]['password'], pswd):
-            print(len(get_well_being(username)))
             if (len(get_well_being(username)) == 0):
                 create_well_being(get_id_user(username), get_size_user(get_id_user(username)))
             return json.dumps({"message": "Connexion réussie", "user": username})  # return token
@@ -363,7 +362,7 @@ def sportsprogramadd():
     level = content['level']
     creator = content['creator']
     username = content['username']
-    id_user = get_id_user(username)
+    id_user = get_id_user(username)[0]['id_user']
     add_sportsprogram(title, description, level, creator, id_user)
     return json.dumps({"message": "Programme créer"})
 
@@ -424,13 +423,12 @@ def addWeightHistorique():
         date = content['date']
         username = content['username']
         id_user = get_id_user(username)[0]["id_user"]
-
         """SI LA LIGNE EXISTE MAIS WATER A NULL"""
         if (len(get_user_weight_weightIsEmpty(id_user,date)) > 0 and len(get_user_weight_weightIsNotEmpty(id_user,date))==0) :
             make_query(f'UPDATE WELL_BEING SET weight = "{weight}" WHERE id_user="{id_user}" and date="{date}"', True)
             return json.dumps({"message": "Insertion réussie"})
         elif (len(get_user_weight_weightIsEmpty(id_user,date)) == 0 and len(get_user_weight_weightIsNotEmpty(id_user,date))==0):
-            make_query(f'INSERT INTO WELL_BEING (id_user,weight,date) VALUES("{id_user}","{weight}","{date}")', True)
+            make_query(f'INSERT INTO WELL_BEING (calories,id_user,weight,date) VALUES(0, "{id_user}","{weight}","{date}")', True)
             return json.dumps({"message": "Insertion réussie pour ce jour"})
         else:
             return json.dumps({"message": "Insertion déjà existante pour cette date, veuillez la modifier dans le menu"})
@@ -442,6 +440,8 @@ def updateWaterHistorique(idWaterOfWellBeing: int):
     if request.method == "POST":
         content = request.get_json()
         water = content['water']
+        print(water)
+        print(idWaterOfWellBeing)
         make_query(f'UPDATE WELL_BEING set water="{water}" WHERE id_well_being="{idWaterOfWellBeing}" ', True)
         return json.dumps({"message": "Update réussie"})
 
@@ -593,7 +593,7 @@ def weightAndSleepAddWeight():
         sleep = float(content['sleep'])
     imc = weight / (data[0]['size'] * data[0]['size'])
     insert_well_being(data[0]['calories'],data[0]['water'],sleep,weight,data[0]['size'],imc,data[0]['id_user'])
-    return json.dumps({"message" : "insertion réussie"})
+    return json.dumps({"message": "insertion réussie"})
     
 
 
@@ -957,11 +957,11 @@ def add_sportsprogram(title: str, description: str, level: str, creator: str, id
     """ create a empty sportprogram """
     make_query(
         f""" INSERT INTO sports_program (title, description, level, creator)
-        VALUES ('{title}', '{description}', '{level}', '{creator}')""", 1
+        VALUES ("{title}", "{description}", "{level}", "{creator}")""", 1
     )
     return make_query(
         f""" INSERT INTO may_have_a (id_user, id_sports_program, date)
-        VALUES ({id_user[0]["id_user"]}, (SELECT max(id_sports_program) from sports_program), datetime(\'now\',\'+1 hours\'))""",
+        VALUES ({id_user}, (SELECT max(id_sports_program) from sports_program), datetime(\'now\',\'+1 hours\'))""",
         1
     )
 
@@ -1076,13 +1076,13 @@ def create_well_being(id: str, size: str):
     print(len({size[0]["size"]}))
     if (len({size[0]["size"]}) == 1):
         return make_query(
-            f""" INSERT INTO well_being(date, id_user)
-            VALUES (date(\'now\',\'+1 hours\'), {id[0]["id_user"]} )""", 1
+            f""" INSERT INTO well_being(date, id_user, calories)
+            VALUES (date(\'now\',\'+1 hours\'), {id[0]["id_user"]}, 0 )""", 1
         )
     else:
         return make_query(
-            f""" INSERT INTO well_being(date, id_user, size)
-            VALUES (date(\'now\',\'+1 hours\'), {id[0]["id_user"]},  {size[0]["size"]})""", 1
+            f""" INSERT INTO well_being(date, id_user, size, calories)
+            VALUES (date(\'now\',\'+1 hours\'), {id[0]["id_user"]},  {size[0]["size"]}, 0)""", 1
         )
 
 
@@ -1097,7 +1097,7 @@ def update_username_and_password(username: str, old_username: str, password: str
 
 
 def get_all_aliments_from_bdd(limit, offset):
-    return make_query(f"SELECT * FROM aliment LIMIT {limit} OFFSET {offset};", needCommit=False)
+    return make_query(f"SELECT * FROM aliment WHERE calories is not null and calories <> 0 LIMIT {limit} OFFSET {offset};", needCommit=False)
 
 
 def count_all_aliments():
@@ -1115,7 +1115,7 @@ def count_all_weightOfUser(username:str):
 def insert_well_being(calories : float, water : float , sleep : float , weight : float,  size : float, imc : float, id_user : int):
     return make_query(
         f"""INSERT INTO WELL_BEING(calories,water,sleep,size,weight,imc,date,id_user) 
-        VALUES('{calories}','{water}','{sleep}','{size}','{weight}','{imc}',datetime(\'now\',\'+1 hours\'),'{id_user}');
+        VALUES(0,'{water}','{sleep}','{size}','{weight}','{imc}',datetime(\'now\',\'+1 hours\'),'{id_user}');
             """, True
     )
 
