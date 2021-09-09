@@ -1,3 +1,4 @@
+from datetime import datetime
 import sqlite3
 import click
 
@@ -559,6 +560,31 @@ def get_all_aliments():
     number_elements = count_all_aliments()[0]['total']
     return json.dumps({'aliments': data, 'total': number_elements})
 
+@app.route("/weightAndSleep", methods={"POST"})
+def weightAndSleep():
+    content = request.get_json()
+    username = content['username']
+    sleeps = get_well_being_for_sleep(username)
+    weights = get_well_being_for_weight(username)
+    return json.dumps({"sleeps" : sleeps, "weights" : weights})
+
+@app.route("/weightAndSleep/addWeight", methods={"POST"})
+def weightAndSleepAddWeight():
+    content = request.get_json()
+    username = content['username']
+    data = make_query(f"SELECT wb.* fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user WHERE u.username = '{username}' ORDER BY wb.date LIMIT 1;", needCommit=False)
+    sleep = data[0]['sleep']
+    weight = data[0]['weight']
+    if('weight' in content):
+        weight = float(content['weight'])
+    if('sleep' in content):
+        sleep = float(content['sleep'])
+    imc = weight / (data[0]['size'] * data[0]['size'])
+    insert_well_being(data[0]['calories'],data[0]['water'],sleep,weight,data[0]['size'],imc,data[0]['id_user'])
+    return json.dumps({"message" : "insertion réussie"})
+    
+
+
 """
     Partie BDD
 """
@@ -960,6 +986,19 @@ def get_well_being(username: str):
             fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user
             WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;""", needCommit=False)
 
+def get_well_being_for_sleep(username: str):
+    return make_query(
+            f"""SELECT wb.weight, wb.sleep, wb.date
+            fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user
+            WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;""", needCommit=False)
+
+
+
+def get_well_being_for_weight(username: str):
+    return make_query(
+            f"""SELECT wb.weight, wb.sleep, wb.date
+            fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user
+            WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;""", needCommit=False)
 
 def get_well_being_stats(username: str):
     return make_query(
@@ -1058,6 +1097,13 @@ def count_all_waterOfUser(username:str):
     userId = get_id_user(username)[0]["id_user"]
     return make_query(f"SELECT count(id_well_being) as 'total' FROM WELL_BEING where id_user = {userId};", needCommit=False)
 
+
+def insert_well_being(calories : float, water : float , sleep : float , weight : float,  size : float, imc : float, id_user : int):
+    return make_query(
+        f"""INSERT INTO WELL_BEING(calories,water,sleep,size,weight,imc,date,id_user) 
+        VALUES('{calories}','{water}','{sleep}','{size}','{weight}','{imc}',datetime(\'now\',\'+1 hours\'),'{id_user}');
+            """, True
+    )
 
 def make_query(query: str, needCommit: bool):
     """ Execute la requête passé en paramètre """
