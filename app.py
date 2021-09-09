@@ -1004,7 +1004,7 @@ def get_well_being_stats(username: str):
     return make_query(
         f"""SELECT round(round(avg(wb.calories)), 0) as 'avgCalories', round(avg(wb.water),1) as 'avgWater', round(avg(wb.sleep)) as 'avgSleep'
                         FROM WELL_BEING wb INNER JOIN USER u on wb.id_user = u.id_user
-                        WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;
+                        WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 5;
             """, False
     )
 def get_user_water_waterIsNotEmpty(id_user: str, date: datetime):
