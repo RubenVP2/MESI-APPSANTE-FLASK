@@ -572,27 +572,21 @@ def get_all_aliments():
     number_elements = count_all_aliments()[0]['total']
     return json.dumps({'aliments': data, 'total': number_elements})
 
-@app.route("/weightAndSleep", methods={"POST"})
+@app.route("/sleeps", methods={"POST"})
 def weightAndSleep():
     content = request.get_json()
     username = content['username']
     sleeps = get_well_being_for_sleep(username)
-    weights = get_well_being_for_weight(username)
-    return json.dumps({"sleeps" : sleeps, "weights" : weights})
+    return json.dumps({"sleeps" : sleeps})
 
-@app.route("/weightAndSleep/addWeight", methods={"POST"})
-def weightAndSleepAddWeight():
+@app.route("/sleeps/addSleep", methods={"POST"})
+def addSleep():
     content = request.get_json()
     username = content['username']
+    date = content['date']
     data = make_query(f"SELECT wb.* fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user WHERE u.username = '{username}' ORDER BY wb.date LIMIT 1;", needCommit=False)
-    sleep = data[0]['sleep']
-    weight = data[0]['weight']
-    if('weight' in content):
-        weight = float(content['weight'])
-    if('sleep' in content):
-        sleep = float(content['sleep'])
-    imc = weight / (data[0]['size'] * data[0]['size'])
-    insert_well_being(data[0]['calories'],data[0]['water'],sleep,weight,data[0]['size'],imc,data[0]['id_user'])
+    sleep = float(content['sleep'])
+    insert_well_being(data[0]['calories'],data[0]['water'],sleep,data[0]['weight'],data[0]['size'],data[0]['imc'],data[0]['id_user'],date)
     return json.dumps({"message": "insertion réussie"})
     
 
@@ -1002,14 +996,6 @@ def get_well_being_for_sleep(username: str):
             fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user
             WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;""", needCommit=False)
 
-
-
-def get_well_being_for_weight(username: str):
-    return make_query(
-            f"""SELECT wb.weight, wb.sleep, wb.date
-            fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user
-            WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 10;""", needCommit=False)
-
 def get_well_being_stats(username: str):
     return make_query(
         f"""SELECT round(round(avg(wb.calories)), 0) as 'avgCalories', round(avg(wb.water),1) as 'avgWater', round(avg(wb.sleep)) as 'avgSleep'
@@ -1112,10 +1098,10 @@ def count_all_weightOfUser(username:str):
     return make_query(f"SELECT count(id_well_being) as 'total' FROM WELL_BEING where id_user = {userId};", needCommit=False)
 
 
-def insert_well_being(calories : float, water : float , sleep : float , weight : float,  size : float, imc : float, id_user : int):
+def insert_well_being(calories : float, water : float , sleep : float , weight : float,  size : float, imc : float, id_user : int, date : str):
     return make_query(
         f"""INSERT INTO WELL_BEING(calories,water,sleep,size,weight,imc,date,id_user) 
-        VALUES(0,'{water}','{sleep}','{size}','{weight}','{imc}',datetime(\'now\',\'+1 hours\'),'{id_user}');
+        VALUES(0,'{water}','{sleep}','{size}','{weight}','{imc}','{date}','{id_user}');
             """, True
     )
 
