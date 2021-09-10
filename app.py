@@ -587,9 +587,9 @@ def addSleep():
     data = make_query(f"SELECT wb.* fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user WHERE u.username = '{username}' ORDER BY wb.date DESC LIMIT 1;", needCommit=False)
     sleep = float(content['sleep'])
     if(date == data[0]['date']) :
-        return json.dumps({"message": "Sommeil déjà saisi pour cette date!", "date" : date, "data_Date" : data[0]['date']})
+        return json.dumps({"message": "Sommeil déjà saisi pour cette date!"})
     insert_well_being(data[0]['calories'],data[0]['water'],sleep,data[0]['weight'],data[0]['size'],data[0]['imc'],data[0]['id_user'],date)
-    return json.dumps({"message": "insertion réussie", "date" : date, "data_Date" : data[0]['date']})
+    return json.dumps({"message": "insertion réussie"})
     
 
 
