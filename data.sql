@@ -37,8 +37,8 @@ INSERT INTO EXERCICE (
         restseries,
         restexercice
     )
-VALUES ('Pompes', '', 15, 4, 45, 120),
-    ('Tractions', '', 12, 4, 45, 120);
+VALUES ('Pompes', 'https://entrainement-sportif.fr/comment-faire-pompe.gif', 15, 4, 45, 120),
+        ('Tractions', 'https://entrainement-sportif.fr/poids-de-corps-traction.png', 12, 4, 45, 120);
 
 INSERT INTO MADE_WORK(
         id_muscle,
@@ -103,21 +103,26 @@ INSERT INTO FEEDBACK (
         id_user
     )
 VALUES ('Bug', 'Bug Suivi Eau','description bug suivi eau', '2021-03-04 14:59:07' ,'Ouvert',1),
+    ('Suggestion', 'Dashboard', 'Je pense que la couleur des graphs sur le dashboard devrait être paramétrable.', '2021-03-04 14:59:07','Ouvert',1),
+    ('Bug', 'Remplissage des données', 'Impossible de saisir des données pour aujourd''hui ... :/', '2020-01-01 18:59:07','Fermé',1),
     ('Suggestion', 'Forum', 'description forum', '2021-03-04 14:59:07','En cours de traitement',2),
-    ('Bug', 'Bug Connexion', 'description bug suivi eau', '2021-03-04 14:59:07','Fermé',null);
+    ('Bug', 'Bug Connexion', 'description bug suivi eau', '2021-03-04 14:59:07','Fermé',1);
 
 
 INSERT INTO WELL_BEING (calories, water, sleep, size, weight, imc, date, id_user)
 VALUES
-    (127.23, 2.9, 8.20, 176.2, 67.9, 20.4, '2009-01-01', 2),
-    (127.23, 2.1, 8.20, 176.2, 67.9, 20.4, '2007-01-01', 2),
-    (111.23, 1.2, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 2),
-    (111.23, 1.9, 1.20, 111.2, 10.9, 20.4, '2011-05-01', 2),
-    (111.23, 1.9, 1.20, 111.2, 31.9, 20.4, '2011-05-01', 2),
-    (111.23, 7.9, 1.20, 111.2, 111.9, 20.4, '2011-05-01', 2),
-    (100,2,8,180,80,25,'2021-03-04 14:59:07',2),
+    (1750, 4, 8, 162, 67.9, 14.1, '2021-03-01', 2),
+    (1198, 3, 8, 164, 69.8, 14.8, '2021-04-01', 2),
+    (1984, 2, 9, 166, 71.2, 15.9, '2021-05-01', 2),
+    (2210, 2.5, 6, 168, 73.3, 16.8, '2021-06-01', 2),
+    (2513, 1.5, 5, 171, 74.8, 17.6, '2021-07-01', 2),
+    (2012, 2, 4, 174, 76.1, 18.9, '2021-08-01', 2),
+    (1389,3,8,179,77.8,20.9,'2021-09-01',2),
 
-    (1500, 2.5, 8, 179, 65, 15, '2021-09-04', 1),
+
+    (1841, 2.1, 10, 179, 61, 15, '2021-07-01', 1),
+    (2212, 2.2, 7, 179, 62, 17, '2021-08-01', 1),
+    (1500, 2.5, 8, 179, 65, 19, '2021-09-04', 1),
     (1850, 1.75, 10, 179, 67.9, 16.8, '2021-09-05', 1),
     (1950, 2, 9, 179, 72.8, 18.9, '2021-09-06', 1),
     (2100, 1.5, 8, 179, 75.9, 19.8, '2021-09-07', 1),

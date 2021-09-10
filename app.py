@@ -61,7 +61,7 @@ def login():
         if len(mdp) == 0:
             return json.dumps({"message": "Username incorrect"})
         elif check_password_hash(mdp[0]['password'], pswd):
-            if (len(get_well_being(username)) == 0):
+            if (len(get_well_being_for_login(username)) == 0):
                 create_well_being(get_id_user(username), get_size_user(get_id_user(username)))
             return json.dumps({"message": "Connexion réussie", "user": username})  # return token
         else:
@@ -550,7 +550,7 @@ def exercices_by_id(id: int):
 
 
 @app.route("/wellBeing/<string:username>", methods=["GET"])
-def get_well_being(username: str):
+def get_well_being_for_login(username: str):
     data = make_query(
         f"SELECT wb.* fROM user u INNER JOIN WELL_BEING wb ON u.id_user = wb.id_user WHERE u.username = '{username}' ORDER BY wb.date;",
         needCommit=False)
@@ -1058,6 +1058,16 @@ def get_well_being_withdate(username: str):
             WHERE u.username = '{username}' 
             AND wb.date = date(\'now\',\'+1 hours\')
             ORDER BY wb.date DESC LIMIT 10;""", 0
+    )
+
+def get_well_being_for_login(username: str):
+    return make_query(
+            f"""SELECT wb.calories, wb.water, wb.sleep, wb.date
+            fROM user u 
+            INNER JOIN WELL_BEING wb 
+            ON u.id_user = wb.id_user
+            WHERE u.username = '{username}' 
+            AND wb.date = date('now');""", 0
     )
 
 
